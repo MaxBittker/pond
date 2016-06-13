@@ -1,5 +1,5 @@
 
-const render = (ctx, creatures, foods) => {
+const render = (ctx, creatures, foods, world) => {
   const {height, width} = ctx.canvas
   const  grd = ctx.createLinearGradient(0,0,width,height);
   grd.addColorStop(0,'#baf');
@@ -8,23 +8,37 @@ const render = (ctx, creatures, foods) => {
 
   // Fill with gradient
   ctx.fillStyle = grd;
-  ctx.fillRect(0,0,width,height);
+  // ctx.fillRect(0,0,width,height);
+
+  for(let x = 0; x < world.maxTiles.x; x+=1){
+    for(let y = 0; y < world.maxTiles.y; y+=1){
+      let bin = world.tiles[x][y]
+      if(bin!==undefined){
+        ctx.fillStyle = `hsl(${180+(bin.length*20)},30%,30%)`
+      }
+      else
+        ctx.fillStyle = `hsl(180,30%,30%)`
+
+      ctx.fillRect(x*world.tileSize,y*world.tileSize,world.tileSize,world.tileSize);
+    }
+  }
+
 
   const sweep = Math.PI/1.6;
 
-  ctx.fillStyle = "#afa";
   ctx.strokeStyle = "#daa"
+  ctx.fillStyle = "#afa";
   foods.forEach(e=>{
     ctx.beginPath();
-    ctx.arc(e.x,e.y, 2 + 0.5*Math.random(), 0, Math.PI*2);
+    ctx.arc(e.p.x,e.p.y, 2 + 0.5*Math.random(), 0, Math.PI*2);
     ctx.stroke()
-    ctx.fill();
   })
+  // ctx.fill();
 
-  ctx.fillStyle = "#faa";
-  ctx.strokeStyle = "#3a3"
+  ctx.strokeStyle = "#fff"
   creatures.forEach(e=>{
     ctx.beginPath();
+    ctx.fillStyle = `hsl(10,${e.energy}%,50%)`;
     ctx.arc(e.p.x,e.p.y, 10+ 0.5*Math.random(), e.angle - sweep, e.angle +sweep);
     ctx.stroke()
     ctx.fill();

@@ -76,11 +76,6 @@ Vector.prototype = {
 		this.setAngle(this.angle() + a);
 		return this;
 	},
-  // rotateTowards: function(a,step){
-  //   let c = this.copy()
-  //   c.rotate(a)
-  //
-  // },
 	limit: function(l)
 	{
 		var mag = this.mag();
@@ -101,6 +96,11 @@ Vector.prototype = {
 		this.x += (v.x - this.x) * amt;
 		this.y += (v.y - this.y) * amt;
 		return this;
+	},
+	wrap: function({x,y}){
+	    const wr = (d,l) => (d+l) % l
+	    this.set(wr(this.x,x),wr(this.y,y))
+			return this
 	},
 	dist: function(v)
 	{

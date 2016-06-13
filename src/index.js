@@ -1,5 +1,8 @@
-import creature from './creature.js';
 import world from './world.js';
+import creature from './creature.js';
+import food from './food.js';
+
+import V from './vector.js';
 import { render } from './render.js';
 let start = null;
 
@@ -7,17 +10,20 @@ let start = null;
 
 const c = document.getElementById("canvas");
 const ctx = c.getContext("2d");
-const {height, width} = ctx.canvas
+const {width, height} = ctx.canvas
 
 
 let creatures = []
 let foods = []
 
+
+let W = new world(width, height, 25)
+
 const genFood = () =>  {
-  return {x:Math.random()*width,y:Math.random()*height}
+  return (new food(Math.random()*width, Math.random()*height))
 }
 
-for(var i=0; i<100 ;i+=2){
+for(var i=0; i<50 ;i+=1){
   creatures.push(new creature(Math.random()*width,Math.random()*height))
   foods.push(genFood())
 }
@@ -25,17 +31,25 @@ for(var i=0; i<100 ;i+=2){
 
 
 const step = ()=> {
+
+    // foods.push(genFood())
+    // foods.push(genFood())
     foods.push(genFood())
     foods.push(genFood())
-    foods.push(genFood())
-    foods.push(genFood())
-    foods.push(genFood())
-    
-    render(ctx,creatures,foods)
+    // foods.push(genFood())
+
+    W.initializeMap()
+    // W.buildMap(creatures.concat(foods))
+    W.buildMap(foods)
+
+    render(ctx,creatures,foods,W)
+    // debugger
     creatures.forEach(c=>{
-      foods = c.eat(foods)
-      c.tick({w:width,h:height})
+      let cBin = W.getNeighbors(c.p)
+      c.tick({x:width,y:height},cBin)
     })
+
+    foods = foods.filter(f=>!f.marked)
 }
 
 

@@ -1,7 +1,6 @@
 import V from './vector.js';
 import synaptic from 'synaptic'
-let many = 0;
-let sum = 0;
+import food from './food.js';
 
 
 class Creature {
@@ -9,51 +8,70 @@ class Creature {
     this.p = new V(x,y)
     this.v = (new V()).random()
     this.network = new synaptic.Architect.Perceptron(2, 25, 2);
+    this.energy = 0;
   }
 
   get angle() {
     return this.v.angle();
   }
 
-  tick(bounds,foods){
-    var activation = this.activate()
+  tick(bounds,neighbors){
+    this.energy*=.995
+    let localFoodCOM = this.getCOM(neighbors).sub(this.p).normalize()
+    //this.p.copy().add(this.getCOM(neighbors))
+
+    var activation = this.activate(localFoodCOM)
     this.move(activation)
-    this.wrap(bounds)
-    // this.eat(foods)
+    this.p.wrap(bounds)
+    this.eat(neighbors)
   }
-  eat(foods){
-    var nf = foods.filter(f=>this.p.dist(f)>10)
-    return nf
+  eat(neighbors){
+    neighbors.length
+    let com = new V()
+    neighbors.forEach(n=>{
+      if(n instanceof food && this.p.dist(n.p) < 10){
+        n.marked = true
+        this.energy+=5;
+      }
+    })
   }
-  activate() {
+  getCOM(entities){
+    if(entities.length===0){
+      return (new V(0,0))
+    }
+    let sum = entities.reduce((avg,e)=>{
+      avg.add(e.p)
+      return avg
+    },(new V(0,0)))
+    return sum.div(entities.length)
+  }
+  activate(COM) {
     var input = [];
-    // input.push(Math.random());
-    // input.push(Math.random());
-    input.push(this.p.y);
-    input.push(this.p.x);
+    input.push(COM.x);
+    input.push(COM.y);
+    // input.push(this.p.y);
+    // input.push(this.p.x);
 
     var output = this.network.activate(input);
 
 
     var learningRate = .3;
-    var target = [Math.random(),Math.random()];
+    var target = [COM.x,COM.y];
 
     this.network.propagate(learningRate, target);
     return output
   }
 
   move([ax, ay]) {
-    let aV = (new V(ax-.5, ay-.5)).normalize()
-    aV.div(5)
+  let aV = (new V(ax-.5, ay-.5)).normalize()
+  // move(a) {
+    // let aV = a.normalize()
+    aV.div(9)
     this.v.add(aV)
     this.v.normalize()
     this.p.add(this.v)
   }
 
-  wrap({w,h}){
-    const wr = (d,l) => (d+l) % l
-    this.p.set(wr(this.p.x,w),wr(this.p.y,h))
-  }
 }
 
 
