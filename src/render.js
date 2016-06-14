@@ -14,7 +14,7 @@ const render = (ctx, creatures, foods, world) => {
     for(let y = 0; y < world.maxTiles.y; y+=1){
       let bin = world.tiles[x][y]
       if(bin!==undefined){
-        ctx.fillStyle = `hsl(${180+(bin.length*20)},30%,30%)`
+        ctx.fillStyle = `hsl(${180+(bin.length*10)},30%,30%)`
       }
       else
         ctx.fillStyle = `hsl(180,30%,30%)`
@@ -25,6 +25,7 @@ const render = (ctx, creatures, foods, world) => {
 
 
   const sweep = Math.PI/1.6;
+  ctx.lineWidth=0.8;
 
   ctx.strokeStyle = "#daa"
   ctx.fillStyle = "#afa";
@@ -35,7 +36,7 @@ const render = (ctx, creatures, foods, world) => {
   })
   // ctx.fill();
 
-  ctx.strokeStyle = "#fff"
+  ctx.strokeStyle = "#0a0"
   creatures.forEach(e=>{
     ctx.beginPath();
     ctx.fillStyle = `hsl(10,${e.energy}%,50%)`;

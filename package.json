@@ -20,6 +20,6 @@
     "webpack": "^1.13.1"
   },
   "dependencies": {
-    "synaptic": "^1.0.4"
+    "synaptic": "git://github.com/MaxBittker/synaptic.git"
   }
 }

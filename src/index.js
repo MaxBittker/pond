@@ -23,7 +23,7 @@ const genFood = () =>  {
   return (new food(Math.random()*width, Math.random()*height))
 }
 
-for(var i=0; i<50 ;i+=1){
+for(var i=0; i<25 ;i+=1){
   creatures.push(new creature(Math.random()*width,Math.random()*height))
   foods.push(genFood())
 }
@@ -34,7 +34,7 @@ const step = ()=> {
 
     // foods.push(genFood())
     // foods.push(genFood())
-    foods.push(genFood())
+    // foods.push(genFood())
     foods.push(genFood())
     // foods.push(genFood())
 

@@ -1,2 +1,3381 @@
-!function(t){function e(n){if(i[n])return i[n].exports;var r=i[n]={exports:{},id:n,loaded:!1};return t[n].call(r.exports,r,r.exports,e),r.loaded=!0,r.exports}var i={};return e.m=t,e.c=i,e.p="/dist/",e(0)}([function(t,e,i){"use strict";function n(t){return t&&t.__esModule?t:{"default":t}}for(var r=i(6),o=n(r),s=i(9),a=(n(s),i(7)),c=null,h=document.getElementById("canvas"),u=h.getContext("2d"),p=u.canvas,l=p.height,f=p.width,d=[],v=[],g=function(){return{x:Math.random()*f,y:Math.random()*l}},y=0;100>y;y+=2)d.push(new o["default"](Math.random()*f,Math.random()*l)),v.push(g());var m=function(){v.push(g()),v.push(g()),v.push(g()),v.push(g()),v.push(g()),(0,a.render)(u,d,v),d.forEach(function(t){v=t.eat(v),t.tick({w:f,h:l})})},w=function b(t){c||(c=t);m(),window.requestAnimationFrame(b)};window.requestAnimationFrame(w)},function(t,e){t.exports=function(t){return t.webpackPolyfill||(t.deprecate=function(){},t.paths=[],t.children=[],t.webpackPolyfill=1),t}},function(t,e,i){(function(t){function e(t,e){for(this.size=0|t,this.list=[],this.label=e||null,this.connectedTo=[];t--;){var i=new n;this.list.push(i)}}t&&(t.exports=e);var n=i(4),r=i(3);e.prototype={activate:function(t){var e=[];if("undefined"!=typeof t){if(t.length!=this.size)throw new Error("INPUT size and LAYER size must be the same to activate!");for(var i in this.list){var n=this.list[i],r=n.activate(t[i]);e.push(r)}}else for(var i in this.list){var n=this.list[i],r=n.activate();e.push(r)}return e},propagate:function(t,e){if("undefined"!=typeof e){if(e.length!=this.size)throw new Error("TARGET size and LAYER size must be the same to propagate!");for(var i=this.list.length-1;i>=0;i--){var n=this.list[i];n.propagate(t,e[i])}}else for(var i=this.list.length-1;i>=0;i--){var n=this.list[i];n.propagate(t)}},project:function(t,i,n){if(t instanceof r&&(t=t.layers.input),!(t instanceof e))throw new Error("Invalid argument, you can only project connections to LAYERS and NETWORKS!");return this.connected(t)?void 0:new e.connection(this,t,i,n)},gate:function(t,i){if(i==e.gateType.INPUT){if(t.to.size!=this.size)throw new Error("GATER layer and CONNECTION.TO layer must be the same size in order to gate!");for(var n in t.to.list){var r=t.to.list[n],o=this.list[n];for(var s in r.connections.inputs){var a=r.connections.inputs[s];a.ID in t.connections&&o.gate(a)}}}else if(i==e.gateType.OUTPUT){if(t.from.size!=this.size)throw new Error("GATER layer and CONNECTION.FROM layer must be the same size in order to gate!");for(var n in t.from.list){var r=t.from.list[n],o=this.list[n];for(var c in r.connections.projected){var a=r.connections.projected[c];a.ID in t.connections&&o.gate(a)}}}else if(i==e.gateType.ONE_TO_ONE){if(t.size!=this.size)throw new Error("The number of GATER UNITS must be the same as the number of CONNECTIONS to gate!");for(var n in t.list){var o=this.list[n],a=t.list[n];o.gate(a)}}t.gatedfrom.push({layer:this,type:i})},selfconnected:function(){for(var t in this.list){var e=this.list[t];if(!e.selfconnected())return!1}return!0},connected:function(t){var i=0;for(var n in this.list)for(var r in t.list){var o=this.list[n],s=t.list[r],a=o.connected(s);"projected"==a.type&&i++}if(i==this.size*t.size)return e.connectionType.ALL_TO_ALL;i=0;for(var c in this.list){var o=this.list[c],s=t.list[c],a=o.connected(s);"projected"==a.type&&i++}return i==this.size?e.connectionType.ONE_TO_ONE:void 0},clear:function(){for(var t in this.list){var e=this.list[t];e.clear()}},reset:function(){for(var t in this.list){var e=this.list[t];e.reset()}},neurons:function(){return this.list},add:function(t){this.neurons[t.ID]=t||new n,this.list.push(t),this.size++},set:function(t){t=t||{};for(var e in this.list){var i=this.list[e];t.label&&(i.label=t.label+"_"+i.ID),t.squash&&(i.squash=t.squash),t.bias&&(i.bias=t.bias)}return this}},e.connection=function(t,i,n,r){if(this.ID=e.connection.uid(),this.from=t,this.to=i,this.selfconnection=i==t,this.type=n,this.connections={},this.list=[],this.size=0,this.gatedfrom=[],"undefined"==typeof this.type&&(t==i?this.type=e.connectionType.ONE_TO_ONE:this.type=e.connectionType.ALL_TO_ALL),this.type==e.connectionType.ALL_TO_ALL||this.type==e.connectionType.ALL_TO_ELSE)for(var o in this.from.list)for(var s in this.to.list){var a=this.from.list[o],c=this.to.list[s];if(this.type!=e.connectionType.ALL_TO_ELSE||a!=c){var h=a.project(c,r);this.connections[h.ID]=h,this.size=this.list.push(h)}}else if(this.type==e.connectionType.ONE_TO_ONE)for(var u in this.from.list){var a=this.from.list[u],c=this.to.list[u],h=a.project(c,r);this.connections[h.ID]=h,this.size=this.list.push(h)}t.connectedTo.push(this)},e.connectionType={},e.connectionType.ALL_TO_ALL="ALL TO ALL",e.connectionType.ONE_TO_ONE="ONE TO ONE",e.connectionType.ALL_TO_ELSE="ALL TO ELSE",e.gateType={},e.gateType.INPUT="INPUT",e.gateType.OUTPUT="OUTPUT",e.gateType.ONE_TO_ONE="ONE TO ONE",function(){var t=0;e.connection.uid=function(){return t++}}()}).call(e,i(1)(t))},function(t,e,i){(function(t){function e(t){"undefined"!=typeof t&&(this.layers=t||{input:null,hidden:{},output:null},this.optimized=null)}t&&(t.exports=e);var n=i(4),r=i(2);e.prototype={activate:function(t){if(this.optimized===!1){this.layers.input.activate(t);for(var e in this.layers.hidden)this.layers.hidden[e].activate();return this.layers.output.activate()}return null==this.optimized&&this.optimize(),this.optimized.activate(t)},propagate:function(t,e){if(this.optimized===!1){this.layers.output.propagate(t,e);var i=[];for(var n in this.layers.hidden)i.push(this.layers.hidden[n]);i.reverse();for(var n in i)i[n].propagate(t)}else null==this.optimized&&this.optimize(),this.optimized.propagate(t,e)},project:function(t,i,n){if(this.optimized&&this.optimized.reset(),t instanceof e)return this.layers.output.project(t.layers.input,i,n);if(t instanceof r)return this.layers.output.project(t,i,n);throw new Error("Invalid argument, you can only project connections to LAYERS and NETWORKS!")},gate:function(t,e){this.optimized&&this.optimized.reset(),this.layers.output.gate(t,e)},clear:function(){this.restore();var t=this.layers.input,e=this.layers.output;t.clear();for(var i in this.layers.hidden){var n=this.layers.hidden[i];n.clear()}e.clear(),this.optimized&&this.optimized.reset()},reset:function(){this.restore();var t=this.layers.input,e=this.layers.output;t.reset();for(var i in this.layers.hidden){var n=this.layers.hidden[i];n.reset()}e.reset(),this.optimized&&this.optimized.reset()},optimize:function(){var t=this,e={},i=this.neurons();for(var n in i){for(var r=i[n].neuron,o=i[n].layer;r.neuron;)r=r.neuron;e=r.optimize(e,o)}for(var n in e.propagation_sentences)e.propagation_sentences[n].reverse();e.propagation_sentences.reverse();var s="";s+="var F = Float64Array ? new Float64Array("+e.memory+") : []; ";for(var n in e.variables)s+="F["+e.variables[n].id+"] = "+(e.variables[n].value||0)+"; ";s+="var activate = function(input){\n";for(var n in e.inputs)s+="F["+e.inputs[n]+"] = input["+n+"]; ";for(var a in e.activation_sentences)if(e.activation_sentences[a].length>0)for(var c in e.activation_sentences[a])s+=e.activation_sentences[a][c].join(" "),s+=e.trace_sentences[a][c].join(" ");s+=" var output = []; ";for(var n in e.outputs)s+="output["+n+"] = F["+e.outputs[n]+"]; ";s+="return output; }; ",s+="var propagate = function(rate, target){\n",s+="F["+e.variables.rate.id+"] = rate; ";for(var n in e.targets)s+="F["+e.targets[n]+"] = target["+n+"]; ";for(var a in e.propagation_sentences)for(var c in e.propagation_sentences[a])s+=e.propagation_sentences[a][c].join(" ")+" ";s+=" };\n",s+="var ownership = function(memoryBuffer){\nF = memoryBuffer;\nthis.memory = F;\n};\n",s+="return {\nmemory: F,\nactivate: activate,\npropagate: propagate,\nownership: ownership\n};",s=s.split(";").join(";\n");var h=new Function(s),u=h();u.data={variables:e.variables,activate:e.activation_sentences,propagate:e.propagation_sentences,trace:e.trace_sentences,inputs:e.inputs,outputs:e.outputs,check_activation:this.activate,check_propagation:this.propagate},u.reset=function(){t.optimized&&(t.optimized=null,t.activate=u.data.check_activation,t.propagate=u.data.check_propagation)},this.optimized=u,this.activate=u.activate,this.propagate=u.propagate},restore:function(){if(this.optimized){var t=this.optimized,e=function(){var e=Array.prototype.slice.call(arguments),i=e.shift(),n=e.pop(),r=n+"_";for(var o in e)r+=e[o]+"_";r+=i.ID;var s=t.memory,a=t.data.variables;return r in a?s[a[r].id]:0},i=this.neurons();for(var n in i){for(var r=i[n].neuron;r.neuron;)r=r.neuron;r.state=e(r,"state"),r.old=e(r,"old"),r.activation=e(r,"activation"),r.bias=e(r,"bias");for(var o in r.trace.elegibility)r.trace.elegibility[o]=e(r,"trace","elegibility",o);for(var s in r.trace.extended)for(var o in r.trace.extended[s])r.trace.extended[s][o]=e(r,"trace","extended",s,o)}for(var n in i){for(var r=i[n].neuron;r.neuron;)r=r.neuron;for(var a in r.connections.projected){var c=r.connections.projected[a];c.weight=e(c,"weight"),c.gain=e(c,"gain")}}}},neurons:function(){var t=[],e=this.layers.input.neurons(),i=this.layers.output.neurons();for(var n in e)t.push({neuron:e[n],layer:"input"});for(var r in this.layers.hidden){var o=this.layers.hidden[r].neurons();for(var n in o)t.push({neuron:o[n],layer:r})}for(var n in i)t.push({neuron:i[n],layer:"output"});return t},inputs:function(){return this.layers.input.size},outputs:function(){return this.layers.output.size},set:function(t){this.layers=t,this.optimized&&this.optimized.reset()},setOptimize:function(t){this.restore(),this.optimized&&this.optimized.reset(),this.optimized=t?null:!1},toJSON:function(t){this.restore();var e=this.neurons(),i=[],r=[],o={};for(var s in e){for(var a=e[s].neuron;a.neuron;)a=a.neuron;o[a.ID]=s;var c={trace:{elegibility:{},extended:{}},state:a.state,old:a.old,activation:a.activation,bias:a.bias,layer:e[s].layer};c.squash=a.squash==n.squash.LOGISTIC?"LOGISTIC":a.squash==n.squash.TANH?"TANH":a.squash==n.squash.IDENTITY?"IDENTITY":a.squash==n.squash.HLIM?"HLIM":null,i.push(c)}for(var s in e){for(var a=e[s].neuron;a.neuron;)a=a.neuron;for(var h in a.connections.projected){var u=a.connections.projected[h];r.push({from:o[u.from.ID],to:o[u.to.ID],weight:u.weight,gater:u.gater?o[u.gater.ID]:null})}a.selfconnected()&&r.push({from:o[a.ID],to:o[a.ID],weight:a.selfconnection.weight,gater:a.selfconnection.gater?o[a.selfconnection.gater.ID]:null})}return{neurons:i,connections:r}},toDot:function(t){var e="digraph nn {\n    rankdir = BT\n",i=[this.layers.input].concat(this.layers.hidden,this.layers.output);for(var n in i)for(var r in i[n].connectedTo){var o=i[n].connectedTo[r],s=o.to,a=o.size,c=i.indexOf(i[n]),h=i.indexOf(s);if(t){if(o.gatedfrom.length){var u="fake"+c+"_"+h;e+="    "+u+' [label = "", shape = point, width = 0.01, height = 0.01]\n',e+="    "+c+" -> "+u+" [label = "+a+", arrowhead = none]\n",e+="    "+u+" -> "+h+"\n"}else e+="    "+c+" -> "+h+" [label = "+a+"]\n";for(var p in o.gatedfrom){var l=o.gatedfrom[p].layer,f=(o.gatedfrom[p].type,i.indexOf(l));e+="    "+f+" -> "+u+" [color = blue]\n"}}else{e+="    "+c+" -> "+h+" [label = "+a+"]\n";for(var p in o.gatedfrom){var l=o.gatedfrom[p].layer,f=(o.gatedfrom[p].type,i.indexOf(l));e+="    "+f+" -> "+h+" [color = blue]\n"}}}return e+="}\n",{code:e,link:"https://chart.googleapis.com/chart?chl="+escape(e.replace("/ /g","+"))+"&cht=gv"}},standalone:function(){this.optimized||this.optimize();var t=this.optimized.data,e="function (input) {\n";for(var i in t.inputs)e+="F["+t.inputs[i]+"] = input["+i+"];\n";for(var n in t.activate)for(var r in t.activate[n])e+=t.activate[n][r].join("")+"\n";e+="var output = [];\n";for(var i in t.outputs)e+="output["+i+"] = F["+t.outputs[i]+"];\n";e+="return output;\n}";var o=e.match(/F\[(\d+)\]/g),s=0,a={};for(var c in o){var h=o[c].match(/\d+/)[0];h in a||(a[h]=s++)}var u="F = {\n";for(var i in a)u+=a[i]+": "+this.optimized.memory[i]+",\n";return u=u.substring(0,u.length-2)+"\n};\n",u="var run = "+e.replace(/F\[(\d+)]/g,function(t){return"F["+a[t.match(/\d+/)[0]]+"]"}).replace("{\n","{\n"+u)+";\n",u+="return run",new Function(u)()},worker:function(){this.optimized||this.optimize();var t="var inputs = "+this.optimized.data.inputs.length+";\n";t+="var outputs = "+this.optimized.data.outputs.length+";\n",t+="var F = null;\n",t+="var activate = "+this.optimized.activate.toString()+";\n",t+="var propagate = "+this.optimized.propagate.toString()+";\n",t+="onmessage = function(e){\n",t+="F = e.data.memoryBuffer;\n",t+="if (e.data.action == 'activate'){\n",t+="if (e.data.input.length == inputs){\n",t+="postMessage( { action: 'activate', output: activate(e.data.input), memoryBuffer: F }, [F.buffer]);\n",t+="}\n}\nelse if (e.data.action == 'propagate'){\n",t+="propagate(e.data.rate, e.data.target);\n",t+="postMessage({ action: 'propagate', memoryBuffer: F }, [F.buffer]);\n",t+="}\n}\n";var e=new Blob([t]),i=window.URL.createObjectURL(e);return new Worker(i)},clone:function(){return e.fromJSON(this.toJSON())}},e.fromJSON=function(t){var i=[],o={input:new r,hidden:[],output:new r};for(var s in t.neurons){var a=t.neurons[s],c=new n;c.trace.elegibility={},c.trace.extended={},c.state=a.state,c.old=a.old,c.activation=a.activation,c.bias=a.bias,c.squash=a.squash in n.squash?n.squash[a.squash]:n.squash.LOGISTIC,i.push(c),"input"==a.layer?o.input.add(c):"output"==a.layer?o.output.add(c):("undefined"==typeof o.hidden[a.layer]&&(o.hidden[a.layer]=new r),o.hidden[a.layer].add(c))}for(var s in t.connections){var a=t.connections[s],h=i[a.from],u=i[a.to],p=a.weight,l=i[a.gater],f=h.project(u,p);l&&l.gate(f)}return new e(o)}}).call(e,i(1)(t))},function(t,e,i){(function(t){function e(){this.ID=e.uid(),this.label=null,this.connections={inputs:{},projected:{},gated:{}},this.error={responsibility:0,projected:0,gated:0},this.trace={elegibility:{},extended:{},influences:{}},this.state=0,this.old=0,this.activation=0,this.selfconnection=new e.connection(this,this,0),this.squash=e.squash.LOGISTIC,this.neighboors={},this.bias=.2*Math.random()-.1}t&&(t.exports=e),e.prototype={activate:function(t){if("undefined"!=typeof t)return this.activation=t,this.derivative=0,this.bias=0,this.activation;this.old=this.state,this.state=this.selfconnection.gain*this.selfconnection.weight*this.state+this.bias;for(var e in this.connections.inputs){var t=this.connections.inputs[e];this.state+=t.from.activation*t.weight*t.gain}this.activation=this.squash(this.state),this.derivative=this.squash(this.state,!0);var i=[];for(var n in this.trace.extended){var r=this.trace.extended[n],o=this.neighboors[n],s=o.selfconnection.gater==this?o.old:0;for(var a in this.trace.influences[o.ID])s+=this.trace.influences[o.ID][a].weight*this.trace.influences[o.ID][a].from.activation;i[o.ID]=s}for(var e in this.connections.inputs){var t=this.connections.inputs[e];this.trace.elegibility[t.ID]=this.selfconnection.gain*this.selfconnection.weight*this.trace.elegibility[t.ID]+t.gain*t.from.activation;for(var n in this.trace.extended){var r=this.trace.extended[n],o=this.neighboors[n],s=i[o.ID];r[t.ID]=o.selfconnection.gain*o.selfconnection.weight*r[t.ID]+this.derivative*this.trace.elegibility[t.ID]*s}}for(var c in this.connections.gated)this.connections.gated[c].gain=this.activation;return this.activation},propagate:function(t,e){var i=0,n="undefined"!=typeof e;if(n)this.error.responsibility=this.error.projected=e-this.activation;else{for(var r in this.connections.projected){var o=this.connections.projected[r],s=o.to;i+=s.error.responsibility*o.gain*o.weight}this.error.projected=this.derivative*i,i=0;for(var r in this.trace.extended){var s=this.neighboors[r],a=s.selfconnection.gater==this?s.old:0;for(var c in this.trace.influences[r])a+=this.trace.influences[r][c].weight*this.trace.influences[s.ID][c].from.activation;i+=s.error.responsibility*a}this.error.gated=this.derivative*i,this.error.responsibility=this.error.projected+this.error.gated}t=t||.1;for(var r in this.connections.inputs){var c=this.connections.inputs[r],h=this.error.projected*this.trace.elegibility[c.ID];for(var r in this.trace.extended){var s=this.neighboors[r];h+=s.error.responsibility*this.trace.extended[s.ID][c.ID]}c.weight+=t*h}this.bias+=t*this.error.responsibility},project:function(t,i){if(t==this)return this.selfconnection.weight=1,this.selfconnection;var n=this.connected(t);if(n&&"projected"==n.type)return"undefined"!=typeof i&&(n.connection.weight=i),n.connection;var r=new e.connection(this,t,i);this.connections.projected[r.ID]=r,this.neighboors[t.ID]=t,t.connections.inputs[r.ID]=r,t.trace.elegibility[r.ID]=0;for(var o in t.trace.extended){var s=t.trace.extended[o];s[r.ID]=0}return r},gate:function(t){this.connections.gated[t.ID]=t;var e=t.to;if(!(e.ID in this.trace.extended)){this.neighboors[e.ID]=e;var i=this.trace.extended[e.ID]={};for(var n in this.connections.inputs){var r=this.connections.inputs[n];i[r.ID]=0}}e.ID in this.trace.influences?this.trace.influences[e.ID].push(t):this.trace.influences[e.ID]=[t],t.gater=this},selfconnected:function(){return 0!==this.selfconnection.weight},connected:function(t){var e={type:null,connection:!1};if(this==t)return this.selfconnected()?(e.type="selfconnection",e.connection=this.selfconnection,e):!1;for(var i in this.connections)for(var n in this.connections[i]){var n=this.connections[i][n];if(n.to==t)return e.type=i,e.connection=n,e;if(n.from==t)return e.type=i,e.connection=n,e}return!1},clear:function(){for(var t in this.trace.elegibility)this.trace.elegibility[t]=0;for(var t in this.trace.extended)for(var e in this.trace.extended[t])this.trace.extended[t][e]=0;this.error.responsibility=this.error.projected=this.error.gated=0},reset:function(){this.clear();for(var t in this.connections)for(var e in this.connections[t])this.connections[t][e].weight=.2*Math.random()-.1;this.bias=.2*Math.random()-.1,this.old=this.state=this.activation=0},optimize:function(t,i){t=t||{};var n=[],r=[],o=[],s=t.memory||0,a=t.neurons||1,c=t.inputs||[],h=t.targets||[],u=t.outputs||[],p=t.variables||{},l=t.activation_sentences||[],f=t.trace_sentences||[],d=t.propagation_sentences||[],v=t.layers||{__count:0,__neuron:0},g=function(t){var e=i in v&&t[v.__count];e||(v.__count=t.push([])-1,v[i]=v.__count)};g(l),g(f),g(d);var y=v.__count,m=function(){var t=Array.prototype.slice.call(arguments);if(1==t.length){if("target"==t[0]){var e="target_"+h.length;h.push(s)}else var e=t[0];return e in p?p[e]:p[e]={value:0,id:s++}}var i=t.length>2;if(i)var n=t.pop();var r=t.shift(),o=t.pop();if(!i)var n=r[o];var e=o+"_";for(var a in t)e+=t[a]+"_";return e+=r.ID,e in p?p[e]:p[e]={value:n,id:s++}},w=function(){var t=Array.prototype.slice.call(arguments),e=t.pop(),i="";for(var n in t)i+="string"==typeof t[n]?t[n]:"F["+t[n].id+"]";e.push(i+";")},b=function(t){for(var e in t)if(t.hasOwnProperty(e))return!1;return!0},T=b(this.connections.projected),I=b(this.connections.gated),D="input"==i?!0:b(this.connections.inputs),_="output"==i?!0:T&&I,O=m("rate"),x=m(this,"activation");if(D)c.push(x.id);else{l[y].push(n),f[y].push(r),d[y].push(o);var z=m(this,"old"),j=m(this,"state"),E=m(this,"bias");if(this.selfconnection.gater)var M=m(this.selfconnection,"gain");if(this.selfconnected())var L=m(this.selfconnection,"weight");w(z," = ",j,n),this.selfconnected()?this.selfconnection.gater?w(j," = ",M," * ",L," * ",j," + ",E,n):w(j," = ",L," * ",j," + ",E,n):w(j," = ",E,n);for(var S in this.connections.inputs){var k=this.connections.inputs[S],A=m(k.from,"activation"),N=m(k,"weight");if(k.gater)var q=m(k,"gain");this.connections.inputs[S].gater?w(j," += ",A," * ",N," * ",q,n):w(j," += ",A," * ",N,n)}var P=m(this,"derivative");switch(this.squash){case e.squash.LOGISTIC:w(x," = (1 / (1 + Math.exp(-",j,")))",n),w(P," = ",x," * (1 - ",x,")",n);break;case e.squash.TANH:var F=m("aux"),C=m("aux_2");w(F," = Math.exp(",j,")",n),w(C," = 1 / ",F,n),w(x," = (",F," - ",C,") / (",F," + ",C,")",n),w(P," = 1 - (",x," * ",x,")",n);break;case e.squash.IDENTITY:w(x," = ",j,n),w(P," = 1",n);break;case e.squash.HLIM:w(x," = +(",j," > 0)",n),w(P," = 1",n);case e.squash.RELU:w(x," = ",j," > 0 ? ",j," : 0",n),w(P," = ",j," > 0 ? 1 : 0",n)}for(var R in this.trace.extended){var H=this.trace.extended[R],U=this.neighboors[R],G=m("influences["+U.ID+"]"),B=m(U,"old"),V=!1;U.selfconnection.gater==this&&(w(G," = ",B,r),V=!0);for(var Y in this.trace.influences[U.ID]){var J=m(this.trace.influences[U.ID][Y],"weight"),X=m(this.trace.influences[U.ID][Y].from,"activation");V?w(G," += ",J," * ",X,r):(w(G," = ",J," * ",X,r),V=!0)}}for(var S in this.connections.inputs){var k=this.connections.inputs[S];if(k.gater)var q=m(k,"gain");var A=m(k.from,"activation"),W=m(this,"trace","elegibility",k.ID,this.trace.elegibility[k.ID]);this.selfconnected()?this.selfconnection.gater?k.gater?w(W," = ",M," * ",L," * ",W," + ",q," * ",A,r):w(W," = ",M," * ",L," * ",W," + ",A,r):k.gater?w(W," = ",L," * ",W," + ",q," * ",A,r):w(W," = ",L," * ",W," + ",A,r):k.gater?w(W," = ",q," * ",A,r):w(W," = ",A,r);for(var R in this.trace.extended){var H=this.trace.extended[R],U=this.neighboors[R],G=m("influences["+U.ID+"]"),B=m(U,"old"),W=m(this,"trace","elegibility",k.ID,this.trace.elegibility[k.ID]),H=m(this,"trace","extended",U.ID,k.ID,this.trace.extended[U.ID][k.ID]);if(U.selfconnected())var K=m(U.selfconnection,"weight");if(U.selfconnection.gater)var Q=m(U.selfconnection,"gain");U.selfconnected()?U.selfconnection.gater?w(H," = ",Q," * ",K," * ",H," + ",P," * ",W," * ",G,r):w(H," = ",K," * ",H," + ",P," * ",W," * ",G,r):w(H," = ",P," * ",W," * ",G,r)}}for(var Z in this.connections.gated){var $=m(this.connections.gated[Z],"gain");w($," = ",x,n)}}if(!D){var tt=m(this,"error","responsibility",this.error.responsibility);if(_){var et=m("target");w(tt," = ",et," - ",x,o);for(var R in this.connections.inputs){var k=this.connections.inputs[R],W=m(this,"trace","elegibility",k.ID,this.trace.elegibility[k.ID]),N=m(k,"weight");w(N," += ",O," * (",tt," * ",W,")",o)}u.push(x.id)}else if(T||I){if(I){w(tt," = 0",o);for(var R in this.connections.projected){var Z=this.connections.projected[R],U=Z.to,it=m(Z,"weight"),nt=m(U,"error","responsibility",U.error.responsibility);if(Z.gater){var rt=m(Z,"gain");w(tt," += ",nt," * ",rt," * ",it,o)}else w(tt," += ",nt," * ",it,o)}w(tt," *= ",P,o);for(var R in this.connections.inputs){var k=this.connections.inputs[R],W=m(this,"trace","elegibility",k.ID,this.trace.elegibility[k.ID]),N=m(k,"weight");w(N," += ",O," * (",tt," * ",W,")",o)}}else if(T){w(tt," = 0",o);for(var R in this.trace.extended){var U=this.neighboors[R],G=m("aux"),B=m(U,"old");U.selfconnection.gater==this?w(G," = ",B,o):w(G," = 0",o);for(var k in this.trace.influences[U.ID]){var Z=this.trace.influences[U.ID][k],it=m(Z,"weight"),ot=m(Z.from,"activation");w(G," += ",it," * ",ot,o)}var nt=m(U,"error","responsibility",U.error.responsibility);w(tt," += ",nt," * ",G,o)}w(tt," *= ",P,o);for(var R in this.connections.inputs){var k=this.connections.inputs[R],st=m("aux");w(st," = 0",o);for(var R in this.trace.extended){var U=this.neighboors[R],nt=m(U,"error","responsibility",U.error.responsibility),H=m(this,"trace","extended",U.ID,k.ID,this.trace.extended[U.ID][k.ID]);w(st," += ",nt," * ",H,o)}var N=m(k,"weight");w(N," += ",O," * ",st,o)}}}else{var at=m("aux");for(var R in this.connections.projected){var Z=this.connections.projected[R],U=Z.to,it=m(Z,"weight"),nt=m(U,"error","responsibility",U.error.responsibility);if(Z.gater){var rt=m(Z,"gain");w(at," += ",nt," * ",rt," * ",it,o)}else w(at," += ",nt," * ",it,o)}var ct=m(this,"error","projected",this.error.projected);w(ct," = ",P," * ",at,o),w(at," = 0",o);for(var R in this.trace.extended){var U=this.neighboors[R],G=m("aux_2"),B=m(U,"old");U.selfconnection.gater==this?w(G," = ",B,o):w(G," = 0",o);for(var k in this.trace.influences[U.ID]){var Z=this.trace.influences[U.ID][k],it=m(Z,"weight"),ot=m(Z.from,"activation");w(G," += ",it," * ",ot,o)}var nt=m(U,"error","responsibility",U.error.responsibility);w(at," += ",nt," * ",G,o)}var ht=m(this,"error","gated",this.error.gated);w(ht," = ",P," * ",at,o),w(tt," = ",ct," + ",ht,o);for(var R in this.connections.inputs){var k=this.connections.inputs[R],st=m("aux"),W=m(this,"trace","elegibility",k.ID,this.trace.elegibility[k.ID]);w(st," = ",ct," * ",W,o);for(var R in this.trace.extended){var U=this.neighboors[R],nt=m(U,"error","responsibility",U.error.responsibility),H=m(this,"trace","extended",U.ID,k.ID,this.trace.extended[U.ID][k.ID]);w(st," += ",nt," * ",H,o)}var N=m(k,"weight");w(N," += ",O," * ",st,o)}}w(E," += ",O," * ",tt,o)}return{memory:s,neurons:a+1,inputs:c,outputs:u,targets:h,variables:p,activation_sentences:l,trace_sentences:f,propagation_sentences:d,layers:v}}},e.connection=function(t,i,n){if(!t||!i)throw new Error("Connection Error: Invalid neurons");this.ID=e.connection.uid(),this.from=t,this.to=i,this.weight="undefined"==typeof n?.2*Math.random()-.1:n,this.gain=1,this.gater=null},e.squash={},e.squash.LOGISTIC=function(t,i){if(!i)return 1/(1+Math.exp(-t));var n=e.squash.LOGISTIC(t);return n*(1-n)},e.squash.TANH=function(t,i){if(i)return 1-Math.pow(e.squash.TANH(t),2);var n=Math.exp(t),r=1/n;return(n-r)/(n+r)},e.squash.IDENTITY=function(t,e){return e?1:t},e.squash.HLIM=function(t,e){return e?1:t>0?1:0},e.squash.RELU=function(t,e){return e?t>0?1:0:t>0?t:0},function(){var t=0,i=0;e.uid=function(){return t++},e.connection.uid=function(){return i++},e.quantity=function(){return{neurons:t,connections:i}}}()}).call(e,i(1)(t))},function(t,e,n){(function(t){function e(t,e){e=e||{},this.network=t,this.rate=e.rate||.2,this.iterations=e.iterations||1e5,this.error=e.error||.005,this.cost=e.cost||null,this.crossValidate=e.crossValidate||null}t&&(t.exports=e),e.prototype={train:function(t,i){function n(t){for(var e,i,n=t.length;n;e=Math.floor(Math.random()*n),i=t[--n],t[n]=t[e],t[e]=i);return t}var r,o,s,a=1,c=bucketSize=0,h=!1,u=i&&i.cost||this.cost||e.cost.MSE,p=!1,l=Date.now();if(i&&(i.shuffle,i.iterations&&(this.iterations=i.iterations),i.error&&(this.error=i.error),i.rate&&(this.rate=i.rate),i.cost&&(this.cost=i.cost),i.schedule&&(this.schedule=i.schedule),i.customLog&&(console.log("Deprecated: use schedule instead of customLog"),this.schedule=i.customLog),this.crossValidate&&(p=!0,i.crossValidate.testSize&&(this.crossValidate.testSize=i.crossValidate.testSize),i.crossValidate.testError&&(this.crossValidate.testError=i.crossValidate.testError))),r=this.rate,Array.isArray(this.rate)&&(bucketSize=Math.floor(this.iterations/this.rate.length)),p){var f=Math.ceil((1-this.crossValidate.testSize)*t.length);s=t.slice(0,f),o=t.slice(f)}for(;!h&&c<this.iterations&&a>this.error&&!(p&&a<=this.crossValidate.testError);){var d=t.length;if(a=0,bucketSize>0){var v=Math.floor(c/bucketSize);r=this.rate[v]||r}p?(this._trainSet(s,r,u),a+=this.test(o).error,d=1):(a+=this._trainSet(t,r,u),d=t.length),c++,a/=d,i&&(this.schedule&&this.schedule.every&&c%this.schedule.every==0?h=this.schedule["do"]({error:a,iterations:c,rate:r}):i.log&&c%i.log==0&&console.log("iterations",c,"error",a,"rate",r),i.shuffle&&n(t))}var g={error:a,iterations:c,time:Date.now()-l};return g},_trainSet:function(t,e,i){var n=0;for(var r in t)input=t[r].input,target=t[r].output,output=this.network.activate(input),this.network.propagate(e,target),n+=i(target,output);return n},test:function(t,i){var n,r,o,s=0,a=i&&i.cost||this.cost||e.cost.MSE,c=Date.now();for(var h in t)n=t[h].input,o=t[h].output,r=this.network.activate(n),s+=a(o,r);s/=t.length;var u={error:s,time:Date.now()-c};return u},workerTrain:function(t,i,n){function r(t){for(var e,i,n=t.length;n;e=Math.floor(Math.random()*n),i=t[--n],t[n]=t[e],t[e]=i);return t}function o(t){v.postMessage({action:"activate",input:t,memoryBuffer:c.network.optimized.memory},[c.network.optimized.memory.buffer])}function s(t){if(bucketSize>0){var e=Math.floor(u/bucketSize);a=c.rate[e]||a}v.postMessage({action:"propagate",target:t,rate:a,memoryBuffer:c.network.optimized.memory},[c.network.optimized.memory.buffer])}var a,c=this,h=1,u=bucketSize=0,p=t.length,l=!1,f=n&&n.cost||c.cost||e.cost.MSE,d=Date.now();n&&(n.shuffle,n.iterations&&(c.iterations=n.iterations),n.error&&(c.error=n.error),n.rate&&(c.rate=n.rate),n.cost&&(c.cost=n.cost),n.schedule&&(c.schedule=n.schedule),n.customLog&&(console.log("Deprecated: use schedule instead of customLog"),c.schedule=n.customLog)),a=c.rate,Array.isArray(c.rate)&&(bucketSize=Math.floor(c.iterations/c.rate.length));var v=c.network.worker();v.onmessage=function(e){c.network.optimized.ownership(e.data.memoryBuffer),"propagate"==e.data.action&&(g>=p?(g=0,u++,h/=t.length,n&&(c.schedule&&c.schedule.every&&u%c.schedule.every==0?l=c.schedule["do"]({error:h,iterations:u,rate:a}):n.log&&u%n.log==0&&console.log("iterations",u,"error",h),n.shuffle&&r(t)),!l&&u<c.iterations&&h>c.error?o(t[g].input):i({error:h,iterations:u,time:Date.now()-d}),h=0):o(t[g].input)),"activate"==e.data.action&&(h+=f(t[g].output,e.data.output),s(t[g].output),g++)};var g=0,u=0;o(t[g].input)},XOR:function(t){if(2!=this.network.inputs()||1!=this.network.outputs())throw new Error("Incompatible network (2 inputs, 1 output)");var i={iterations:1e5,log:!1,shuffle:!0,cost:e.cost.MSE};if(t)for(var n in t)i[n]=t[n];return this.train([{input:[0,0],output:[0]},{input:[1,0],output:[1]},{input:[0,1],output:[1]},{input:[1,1],output:[0]}],i)},DSR:function(t){t=t||{};for(var n=t.targets||[2,4,7,8],r=t.distractors||[3,5,6,9],o=t.prompts||[0,1],s=t.length||24,a=t.success||.95,c=t.iterations||1e5,h=t.rate||.1,u=t.log||0,p=t.schedule||{},l=t.cost||this.cost||e.cost.CROSS_ENTROPY,f=correct=i=j=success=0,d=1,v=n.length+r.length+o.length,g=function(t,e){var i=Math.random()*t|0,n=!1;for(var r in e)i==e[r]&&(n=!0);return n?g(t,e):i},y=function(t,e){for(var i in t)if(Math.round(t[i])!=e[i])return!1;return!0},m=Date.now();c>f&&(success<a||f%1e3!=0);){var w=[],b=s-o.length;for(i=0;i<b;i++){var T=Math.random()*r.length|0;w.push(r[T])}var I=[],D=[];for(i=0;i<o.length;i++)I.push(Math.random()*n.length|0),D.push(g(b,D));for(D=D.sort(),i=0;i<o.length;i++)w[D[i]]=n[I[i]],w.push(o[i]);var _=distractorsCorrect=0;for(d=0,i=0;i<s;i++){var O=[];for(j=0;j<v;j++)O[j]=0;O[w[i]]=1;var x=[];for(j=0;j<n.length;j++)x[j]=0;if(i>=b){var z=i-b;x[I[z]]=1}var E=this.network.activate(O);y(E,x)?i<b?distractorsCorrect++:_++:this.network.propagate(h,x),d+=l(x,E),distractorsCorrect+_==s&&correct++}f%1e3==0&&(correct=0),f++;var M=f%1e3;M=0==M?1e3:M,success=correct/M,d/=s,u&&f%u==0&&console.log("iterations:",f," success:",success," correct:",correct," time:",Date.now()-m," error:",d),p["do"]&&p.every&&f%p.every==0&&p["do"]({iterations:f,success:success,error:d,time:Date.now()-m,correct:correct})}return{iterations:f,success:success,error:d,time:Date.now()-m}},ERG:function(t){t=t||{};var i=t.iterations||15e4,n=t.error||.05,r=t.rate||.1,o=t.log||500,s=t.cost||this.cost||e.cost.CROSS_ENTROPY,a=function(){this.paths=[]};a.prototype={connect:function(t,e){return this.paths.push({node:t,value:e}),this},any:function(){if(0==this.paths.length)return!1;var t=Math.random()*this.paths.length|0;return this.paths[t]},test:function(t){for(var e in this.paths)if(this.paths[e].value==t)return this.paths[e];return!1}};for(var c=function(){var t=new a,e=(new a).connect(t,"E"),i=(new a).connect(e,"S"),n=(new a).connect(e,"V").connect(i,"P"),r=(new a).connect(i,"X");r.connect(r,"S");var o=(new a).connect(n,"V");o.connect(o,"T"),i.connect(o,"X");var s=(new a).connect(r,"T").connect(o,"P"),c=(new a).connect(s,"B");return{input:c,output:t}},h=function(){var t=c(),e=c(),i=new a,n=(new a).connect(i,"E");t.output.connect(n,"T"),e.output.connect(n,"P");var r=(new a).connect(t.input,"P").connect(e.input,"T"),o=(new a).connect(r,"B");return{input:o,output:i}},u=function(){for(var t=h().input,e=t.any(),i="";e;)i+=e.value,e=e.node.any();return i},p=function(t){for(var e=h().input,i=0,n=t.charAt(i);i<t.length;){var r=e.test(n);if(!r)return!1;e=r.node,n=t.charAt(++i)}return!0},l=function(t,e){var i=0,n=-1,r=0,o=-1;for(var s in t)t[s]>i&&(i=t[s],n=s),e[s]>r&&(r=e[s],o=s);return n!=o},f=0,d=1,v={B:0,
-P:1,T:2,X:3,S:4,E:5},g=Date.now();i>f&&d>n;){var y=0;d=0;for(var m=u(),w=m.charAt(y),b=m.charAt(y+1);y<m.length-1;){for(var T=[],I=[],D=0;6>D;D++)T[D]=0,I[D]=0;T[v[w]]=1,I[v[b]]=1;var _=this.network.activate(T);l(_,I)&&this.network.propagate(r,I),w=m.charAt(++y),b=m.charAt(y+1),d+=s(I,_)}d/=m.length,f++,f%o==0&&console.log("iterations:",f," time:",Date.now()-g," error:",d)}return{iterations:f,error:d,time:Date.now()-g,test:p,generate:u}},timingTask:function(t){function i(t,e){for(var i=t+e,n=0,r=[],o=0;i>o;o++)r.push({input:[0,0],output:[0]});for(;i-20>n;){var s=Math.round(20*Math.random());r[n].input[0]=1;for(var a=n;n+s>=a;a++)r[a].input[1]=s/20,r[a].output[0]=.5;n+=s,s=Math.round(20*Math.random());for(var c=n+1;n+s>=c&&i>c;c++)r[c].input[1]=r[n].input[1];n+=s}for(var h=[],u=[],p=0;i>p;p++)(t>p?h:u).push(r[p]);return{train:h,test:u}}if(2!=this.network.inputs()||1!=this.network.outputs())throw new Error("Invalid Network: must have 2 inputs and one output");if("undefined"==typeof t)var t={};var n=t.iterations||200,r=t.error||.005,o=t.rate||[.03,.02],s=t.log===!1?!1:t.log||10,a=t.cost||this.cost||e.cost.MSE,c=t.trainSamples||7e3,h=t.trainSamples||1e3,u=i(c,h),p=this.train(u.train,{rate:o,log:s,iterations:n,error:r,cost:a});return{train:p,test:this.test(u.test)}}},e.cost={CROSS_ENTROPY:function(t,e){var i=0;for(var n in e)i-=t[n]*Math.log(e[n]+1e-15)+(1-t[n])*Math.log(1+1e-15-e[n]);return i},MSE:function(t,e){var i=0;for(var n in e)i+=Math.pow(t[n]-e[n],2);return i/e.length},BINARY:function(t,e){var i=0;for(var n in e)i+=Math.round(2*t[n])!=Math.round(2*e[n]);return i}}}).call(e,n(1)(t))},function(t,e,i){"use strict";function n(t){return t&&t.__esModule?t:{"default":t}}function r(t,e){if(!(t instanceof e))throw new TypeError("Cannot call a class as a function")}Object.defineProperty(e,"__esModule",{value:!0}),e.Creature=void 0;var o=function(){function t(t,e){var i=[],n=!0,r=!1,o=void 0;try{for(var s,a=t[Symbol.iterator]();!(n=(s=a.next()).done)&&(i.push(s.value),!e||i.length!==e);n=!0);}catch(c){r=!0,o=c}finally{try{!n&&a["return"]&&a["return"]()}finally{if(r)throw o}}return i}return function(e,i){if(Array.isArray(e))return e;if(Symbol.iterator in Object(e))return t(e,i);throw new TypeError("Invalid attempt to destructure non-iterable instance")}}(),s=function(){function t(t,e){for(var i=0;i<e.length;i++){var n=e[i];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(t,n.key,n)}}return function(e,i,n){return i&&t(e.prototype,i),n&&t(e,n),e}}(),a=i(8),c=n(a),h=i(11),u=n(h),p=function(){function t(e,i){r(this,t),this.p=new c["default"](e,i),this.v=(new c["default"]).random(),this.network=new u["default"].Architect.Perceptron(2,25,2)}return s(t,[{key:"tick",value:function(t,e){var i=this.activate();this.move(i),this.wrap(t)}},{key:"eat",value:function(t){var e=this,i=t.filter(function(t){return e.p.dist(t)>10});return i}},{key:"activate",value:function(){var t=[];t.push(this.p.y),t.push(this.p.x);var e=this.network.activate(t),i=.3,n=[Math.random(),Math.random()];return this.network.propagate(i,n),e}},{key:"move",value:function(t){var e=o(t,2),i=e[0],n=e[1],r=new c["default"](i-.5,n-.5).normalize();r.div(5),this.v.add(r),this.v.normalize(),this.p.add(this.v)}},{key:"wrap",value:function(t){var e=t.w,i=t.h,n=function(t,e){return(t+e)%e};this.p.set(n(this.p.x,e),n(this.p.y,i))}},{key:"angle",get:function(){return this.v.angle()}}]),t}();e.Creature=p,e["default"]=p},function(t,e){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var i=function(t,e,i){var n=t.canvas,r=n.height,o=n.width,s=t.createLinearGradient(0,0,o,r);s.addColorStop(0,"#baf"),s.addColorStop(.5,"#bbe"),s.addColorStop(1,"#abf"),t.fillStyle=s,t.fillRect(0,0,o,r);var a=Math.PI/1.6;t.fillStyle="#afa",t.strokeStyle="#daa",i.forEach(function(e){t.beginPath(),t.arc(e.x,e.y,2+.5*Math.random(),0,2*Math.PI),t.stroke(),t.fill()}),t.fillStyle="#faa",t.strokeStyle="#3a3",e.forEach(function(e){t.beginPath(),t.arc(e.p.x,e.p.y,10+.5*Math.random(),e.angle-a,e.angle+a),t.stroke(),t.fill()})};e.render=i},function(t,e){"use strict";function i(t,e){this.x=t,this.y=e}Object.defineProperty(e,"__esModule",{value:!0}),i.prototype={set:function(t,e){return this.x=t,this.y=e,this},add:function(t){return this.x+=t.x,this.y+=t.y,this},sub:function(t){return this.x-=t.x,this.y-=t.y,this},mul:function(t){return this.x*=t,this.y*=t,this},div:function(t){return!t&&console.log("Division by zero!"),this.x/=t,this.y/=t,this},mag:function(){return Math.sqrt(this.x*this.x+this.y*this.y)},normalize:function(){var t=this.mag();return t&&this.div(t),this},angle:function(){return Math.atan2(this.y,this.x)},setMag:function(t){var e=this.angle();return this.x=t*Math.cos(e),this.y=t*Math.sin(e),this},setAngle:function(t){var e=this.mag();return this.x=e*Math.cos(t),this.y=e*Math.sin(t),this},rotate:function(t){return this.setAngle(this.angle()+t),this},limit:function(t){var e=this.mag();return e>t&&this.setMag(t),this},angleBetween:function(t){return this.angle()-t.angle()},dot:function(t){return this.x*t.x+this.y*t.y},lerp:function(t,e){return this.x+=(t.x-this.x)*e,this.y+=(t.y-this.y)*e,this},dist:function(t){var e=this.x-t.x,i=this.y-t.y;return Math.sqrt(e*e+i*i)},copy:function(){return new i(this.x,this.y)},random:function(){return this.set(1,1),this.setAngle(Math.random()*Math.PI*2),this}},e["default"]=i},function(t,e){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e["default"]=function(){return"world"}},function(t,e,i){(function(t){var e=i(2),n=i(3),r=i(5),o={Perceptron:function(){var t=Array.prototype.slice.call(arguments);if(t.length<3)throw new Error("not enough layers (minimum 3) !!");var i=t.shift(),n=t.pop(),o=t,s=new e(i),a=[],c=new e(n),h=s;for(level in o){var u=o[level],p=new e(u);a.push(p),h.project(p),h=p}h.project(c),this.set({input:s,hidden:a,output:c}),this.trainer=new r(this)},LSTM:function(){var t=Array.prototype.slice.call(arguments);if(t.length<3)throw new Error("not enough layers (minimum 3) !!");var i=t.pop(),n={peepholes:e.connectionType.ALL_TO_ALL,hiddenToHidden:!1,outputToHidden:!1,outputToGates:!1,inputToOutput:!0};if("number"!=typeof i){var o=t.pop();i.hasOwnProperty("peepholes")&&(n.peepholes=i.peepholes),i.hasOwnProperty("hiddenToHidden")&&(n.hiddenToHidden=i.hiddenToHidden),i.hasOwnProperty("outputToHidden")&&(n.outputToHidden=i.outputToHidden),i.hasOwnProperty("outputToGates")&&(n.outputToGates=i.outputToGates),i.hasOwnProperty("inputToOutput")&&(n.inputToOutput=i.inputToOutput)}else var o=i;var s=t.shift(),a=t,c=new e(s),h=[],u=new e(o),p=null;for(var l in a){var f=a[l],d=new e(f).set({bias:1}),v=new e(f).set({bias:1}),g=new e(f),y=new e(f).set({bias:1});h.push(d),h.push(v),h.push(g),h.push(y);var m=c.project(g);if(c.project(d),c.project(v),c.project(y),null!=p){var w=p.project(g);p.project(d),p.project(v),p.project(y)}var b=g.project(u),T=g.project(g);n.hiddenToHidden&&g.project(g,e.connectionType.ALL_TO_ELSE),n.outputToHidden&&u.project(g),n.outputToGates&&(u.project(d),u.project(y),u.project(v)),g.project(d,n.peepholes),g.project(v,n.peepholes),g.project(y,n.peepholes),d.gate(m,e.gateType.INPUT),v.gate(T,e.gateType.ONE_TO_ONE),y.gate(b,e.gateType.OUTPUT),null!=p&&d.gate(w,e.gateType.INPUT),p=g}n.inputToOutput&&c.project(u),this.set({input:c,hidden:h,output:u}),this.trainer=new r(this)},Liquid:function(t,i,n,o,s){for(var a=new e(t),c=new e(i),h=new e(n),u=c.neurons(),p=[],l=0;o>l;l++){var f=Math.random()*u.length|0,d=Math.random()*u.length|0,v=u[f].project(u[d]);p.push(v)}for(var g=0;s>g;g++){var y=Math.random()*u.length|0,v=Math.random()*p.length|0;u[y].gate(p[v])}a.project(c),c.project(h),this.set({input:a,hidden:[c],output:h}),this.trainer=new r(this)},Hopfield:function(t){var i=new e(t),n=new e(t);i.project(n,e.connectionType.ALL_TO_ALL),this.set({input:i,hidden:[],output:n});var s=new r(this),a=o.Hopfield.prototype;a.learn=a.learn||function(t){var e=[];for(var i in t)e.push({input:t[i],output:t[i]});return s.train(e,{iterations:5e5,error:5e-5,rate:1})},a.feed=a.feed||function(t){var e=this.activate(t),t=[];for(var i in e)t[i]=e[i]>.5?1:0;return t}}};for(var s in o)o[s].prototype=new n,o[s].prototype.constructor=o[s];t&&(t.exports=o)}).call(e,i(1)(t))},function(t,e,i){var n,r,o={Neuron:i(4),Layer:i(2),Network:i(3),Trainer:i(5),Architect:i(10)};n=[],r=function(){return o}.apply(e,n),!(void 0!==r&&(t.exports=r)),"undefined"!=typeof t&&t.exports&&(t.exports=o),"object"==typeof window&&(!function(){var t=window.synaptic;o.ninja=function(){return window.synaptic=t,o}}(),window.synaptic=o)}]);
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId])
+/******/ 			return installedModules[moduleId].exports;
+
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			exports: {},
+/******/ 			id: moduleId,
+/******/ 			loaded: false
+/******/ 		};
+
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+
+/******/ 		// Flag the module as loaded
+/******/ 		module.loaded = true;
+
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+
+
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "/dist/";
+
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(0);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _world = __webpack_require__(1);
+
+	var _world2 = _interopRequireDefault(_world);
+
+	var _creature = __webpack_require__(10);
+
+	var _creature2 = _interopRequireDefault(_creature);
+
+	var _food = __webpack_require__(11);
+
+	var _food2 = _interopRequireDefault(_food);
+
+	var _vector = __webpack_require__(2);
+
+	var _vector2 = _interopRequireDefault(_vector);
+
+	var _render = __webpack_require__(12);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var start = null;
+
+	var c = document.getElementById("canvas");
+	var ctx = c.getContext("2d");
+	var _ctx$canvas = ctx.canvas;
+	var width = _ctx$canvas.width;
+	var height = _ctx$canvas.height;
+
+
+	var creatures = [];
+	var foods = [];
+
+	var W = new _world2.default(width, height, 25);
+
+	var genFood = function genFood() {
+	  return new _food2.default(Math.random() * width, Math.random() * height);
+	};
+
+	for (var i = 0; i < 50; i += 1) {
+	  creatures.push(new _creature2.default(Math.random() * width, Math.random() * height));
+	  foods.push(genFood());
+	}
+
+	var step = function step() {
+
+	  // foods.push(genFood())
+	  // foods.push(genFood())
+	  foods.push(genFood());
+	  foods.push(genFood());
+	  // foods.push(genFood())
+
+	  W.initializeMap();
+	  // W.buildMap(creatures.concat(foods))
+	  W.buildMap(foods);
+
+	  (0, _render.render)(ctx, creatures, foods, W);
+	  // debugger
+	  creatures.forEach(function (c) {
+	    var cBin = W.getNeighbors(c.p);
+	    c.tick({ x: width, y: height }, cBin);
+	  });
+
+	  foods = foods.filter(function (f) {
+	    return !f.marked;
+	  });
+	};
+
+	var frame = function frame(timestamp) {
+	  if (!start) start = timestamp;
+	  var progress = timestamp - start;
+	  step();
+	  window.requestAnimationFrame(frame);
+	};
+
+	window.requestAnimationFrame(frame);
+
+/***/ },
+/* 1 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.World = undefined;
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _vector = __webpack_require__(2);
+
+	var _vector2 = _interopRequireDefault(_vector);
+
+	var _synaptic = __webpack_require__(3);
+
+	var _synaptic2 = _interopRequireDefault(_synaptic);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var World = function () {
+	  function World(width, height, tileSize) {
+	    _classCallCheck(this, World);
+
+	    this.worldsize = new _vector2.default(width, height);
+	    this.tileSize = tileSize;
+	    this.maxTiles = new _vector2.default(this.worldsize.x / tileSize | 0, this.worldsize.y / tileSize | 0);
+	    this.tiles = this.initializeMap();
+	  }
+
+	  _createClass(World, [{
+	    key: 'initializeMap',
+	    value: function initializeMap() {
+	      this.tiles = new Array(this.maxTiles.x);
+	      for (var x = 0; x < this.maxTiles.x; x += 1) {
+	        this.tiles[x] = new Array(this.maxTiles.y);
+	      }
+	    }
+	  }, {
+	    key: 'hashLoc',
+	    value: function hashLoc(p) {
+	      var hx = p.x / this.tileSize | 0;
+	      var hy = p.y / this.tileSize | 0;
+	      return new _vector2.default(hx, hy);
+	    }
+	  }, {
+	    key: 'getBin',
+	    value: function getBin(p, prehashed) {
+	      var hp = this.hashLoc(p);
+	      if (prehashed === true) {
+	        hp = p;
+	      }
+	      var bin = this.tiles[hp.x][hp.y];
+	      if (bin !== undefined) return bin;
+	      return [];
+	    }
+	  }, {
+	    key: 'getNeighbors',
+	    value: function getNeighbors(p) {
+	      var hp = this.hashLoc(p);
+	      var neighbors = [];
+	      for (var dx = -1; dx <= 1; dx++) {
+	        for (var dy = -1; dy <= 1; dy++) {
+	          var np = hp.copy().add(new _vector2.default(dx, dy)).wrap(this.maxTiles);
+	          var nBin = this.getBin(np, true);
+	          neighbors = neighbors.concat(nBin);
+	        }
+	      }
+	      return neighbors;
+	    }
+	  }, {
+	    key: 'buildMap',
+	    value: function buildMap(entities) {
+	      var _iteratorNormalCompletion = true;
+	      var _didIteratorError = false;
+	      var _iteratorError = undefined;
+
+	      try {
+	        for (var _iterator = entities[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	          var e = _step.value;
+
+	          var hp = this.hashLoc(e.p);
+	          if (this.tiles[hp.x][hp.y] === undefined) this.tiles[hp.x][hp.y] = [e];else this.tiles[hp.x][hp.y].push(e);
+	        }
+	      } catch (err) {
+	        _didIteratorError = true;
+	        _iteratorError = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion && _iterator.return) {
+	            _iterator.return();
+	          }
+	        } finally {
+	          if (_didIteratorError) {
+	            throw _iteratorError;
+	          }
+	        }
+	      }
+	    }
+	  }]);
+
+	  return World;
+	}();
+
+	exports.World = World;
+	exports.default = World;
+
+/***/ },
+/* 2 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	/*https://github.com/cazala/synaptic/blob/gh-pages/scripts/homepage/vector.js */
+
+	function Vector(x, y) {
+		this.x = x;
+		this.y = y;
+	}
+
+	Vector.prototype = {
+		set: function set(x, y) {
+			this.x = x;
+			this.y = y;
+
+			return this;
+		},
+		add: function add(v) {
+			this.x += v.x;
+			this.y += v.y;
+
+			return this;
+		},
+		sub: function sub(v) {
+			this.x -= v.x;
+			this.y -= v.y;
+
+			return this;
+		},
+		mul: function mul(s) {
+			this.x *= s;
+			this.y *= s;
+
+			return this;
+		},
+		div: function div(s) {
+			!s && console.log("Division by zero!");
+
+			this.x /= s;
+			this.y /= s;
+
+			return this;
+		},
+		mag: function mag() {
+			return Math.sqrt(this.x * this.x + this.y * this.y);
+		},
+		normalize: function normalize() {
+			var mag = this.mag();
+			mag && this.div(mag);
+			return this;
+		},
+		angle: function angle() {
+			return Math.atan2(this.y, this.x);
+		},
+		setMag: function setMag(m) {
+			var angle = this.angle();
+			this.x = m * Math.cos(angle);
+			this.y = m * Math.sin(angle);
+			return this;
+		},
+		setAngle: function setAngle(a) {
+			var mag = this.mag();
+			this.x = mag * Math.cos(a);
+			this.y = mag * Math.sin(a);
+			return this;
+		},
+		rotate: function rotate(a) {
+			this.setAngle(this.angle() + a);
+			return this;
+		},
+		limit: function limit(l) {
+			var mag = this.mag();
+			if (mag > l) this.setMag(l);
+			return this;
+		},
+		angleBetween: function angleBetween(v) {
+			return this.angle() - v.angle();
+		},
+		dot: function dot(v) {
+			return this.x * v.x + this.y * v.y;
+		},
+		lerp: function lerp(v, amt) {
+			this.x += (v.x - this.x) * amt;
+			this.y += (v.y - this.y) * amt;
+			return this;
+		},
+		wrap: function wrap(_ref) {
+			var x = _ref.x;
+			var y = _ref.y;
+
+			var wr = function wr(d, l) {
+				return (d + l) % l;
+			};
+			this.set(wr(this.x, x), wr(this.y, y));
+			return this;
+		},
+		dist: function dist(v) {
+			var dx = this.x - v.x;
+			var dy = this.y - v.y;
+			return Math.sqrt(dx * dx + dy * dy);
+		},
+		copy: function copy() {
+			return new Vector(this.x, this.y);
+		},
+		random: function random() {
+			this.set(1, 1);
+			this.setAngle(Math.random() * Math.PI * 2);
+			return this;
+		}
+	};
+
+	exports.default = Vector;
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
+
+	The MIT License (MIT)
+
+	Copyright (c) 2014 Juan Cazala - juancazala.com
+
+	Permission is hereby granted, free of charge, to any person obtaining a copy
+	of this software and associated documentation files (the "Software"), to deal
+	in the Software without restriction, including without limitation the rights
+	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	copies of the Software, and to permit persons to whom the Software is
+	furnished to do so, subject to the following conditions:
+
+	The above copyright notice and this permission notice shall be included in
+	all copies or substantial portions of the Software.
+
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	THE SOFTWARE
+
+
+
+	********************************************************************************************
+	                                         SYNAPTIC
+	********************************************************************************************
+
+	Synaptic is a javascript neural network library for node.js and the browser, its generalized
+	algorithm is architecture-free, so you can build and train basically any type of first order
+	or even second order neural network architectures.
+
+	http://en.wikipedia.org/wiki/Recurrent_neural_network#Second_Order_Recurrent_Neural_Network
+
+	The library includes a few built-in architectures like multilayer perceptrons, multilayer
+	long-short term memory networks (LSTM) or liquid state machines, and a trainer capable of
+	training any given network, and includes built-in training tasks/tests like solving an XOR,
+	passing a Distracted Sequence Recall test or an Embeded Reber Grammar test.
+
+	The algorithm implemented by this library has been taken from Derek D. Monner's paper:
+
+	A generalized LSTM-like training algorithm for second-order recurrent neural networks
+	http://www.overcomplete.net/papers/nn2012.pdf
+
+	There are references to the equations in that paper commented through the source code.
+
+
+	********************************************************************************************/
+
+	var Synaptic = {
+	    Neuron: __webpack_require__(4),
+	    Layer: __webpack_require__(6),
+	    Network: __webpack_require__(7),
+	    Trainer: __webpack_require__(8),
+	    Architect: __webpack_require__(9)
+	};
+
+	// CommonJS & AMD
+	if (true)
+	{
+	  !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function(){ return Synaptic }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	}
+
+	// Node.js
+	if (typeof module !== 'undefined' && module.exports)
+	{
+	  module.exports = Synaptic;
+	}
+
+	// Browser
+	if (typeof window == 'object')
+	{
+	  (function(){ 
+	    var oldSynaptic = window['synaptic'];
+	    Synaptic.ninja = function(){ 
+	      window['synaptic'] = oldSynaptic; 
+	      return Synaptic;
+	    };	
+	  })();
+
+	  window['synaptic'] = Synaptic;
+	}
+
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(module) {// export
+	if (module) module.exports = Neuron;
+
+	/******************************************************************************************
+	                                         NEURON
+	*******************************************************************************************/
+
+	function Neuron() {
+	  this.ID = Neuron.uid();
+	  this.label = null;
+	  this.connections = {
+	    inputs: {},
+	    projected: {},
+	    gated: {}
+	  };
+	  this.error = {
+	    responsibility: 0,
+	    projected: 0,
+	    gated: 0
+	  };
+	  this.trace = {
+	    elegibility: {},
+	    extended: {},
+	    influences: {}
+	  };
+	  this.state = 0;
+	  this.old = 0;
+	  this.activation = 0;
+	  this.selfconnection = new Neuron.connection(this, this, 0); // weight = 0 -> not connected
+	  this.squash = Neuron.squash.LOGISTIC;
+	  this.neighboors = {};
+	  this.bias = Math.random() * .2 - .1;
+	}
+
+	Neuron.prototype = {
+
+	  // activate the neuron
+	  activate: function(input) {
+	    // activation from enviroment (for input neurons)
+	    if (typeof input != 'undefined') {
+	      this.activation = input;
+	      this.derivative = 0;
+	      this.bias = 0;
+	      return this.activation;
+	    }
+
+	    // old state
+	    this.old = this.state;
+
+	    // eq. 15
+	    this.state = this.selfconnection.gain * this.selfconnection.weight *
+	      this.state + this.bias;
+
+	    for (var i in this.connections.inputs) {
+	      var input = this.connections.inputs[i];
+	      this.state += input.from.activation * input.weight * input.gain;
+	    }
+
+	    // eq. 16
+	    this.activation = this.squash(this.state);
+
+	    // f'(s)
+	    this.derivative = this.squash(this.state, true);
+
+	    // update traces
+	    var influences = [];
+	    for (var id in this.trace.extended) {
+	      // extended elegibility trace
+	      var xtrace = this.trace.extended[id];
+	      var neuron = this.neighboors[id];
+
+	      // if gated neuron's selfconnection is gated by this unit, the influence keeps track of the neuron's old state
+	      var influence = neuron.selfconnection.gater == this ? neuron.old : 0;
+
+	      // index runs over all the incoming connections to the gated neuron that are gated by this unit
+	      for (var incoming in this.trace.influences[neuron.ID]) { // captures the effect that has an input connection to this unit, on a neuron that is gated by this unit
+	        influence += this.trace.influences[neuron.ID][incoming].weight *
+	          this.trace.influences[neuron.ID][incoming].from.activation;
+	      }
+	      influences[neuron.ID] = influence;
+	    }
+
+	    for (var i in this.connections.inputs) {
+	      var input = this.connections.inputs[i];
+
+	      // elegibility trace - Eq. 17
+	      this.trace.elegibility[input.ID] = this.selfconnection.gain * this.selfconnection
+	        .weight * this.trace.elegibility[input.ID] + input.gain * input.from
+	        .activation;
+
+	      for (var id in this.trace.extended) {
+	        // extended elegibility trace
+	        var xtrace = this.trace.extended[id];
+	        var neuron = this.neighboors[id];
+	        var influence = influences[neuron.ID];
+
+	        // eq. 18
+	        xtrace[input.ID] = neuron.selfconnection.gain * neuron.selfconnection
+	          .weight * xtrace[input.ID] + this.derivative * this.trace.elegibility[
+	            input.ID] * influence;
+	      }
+	    }
+
+	    //  update gated connection's gains
+	    for (var connection in this.connections.gated) {
+	      this.connections.gated[connection].gain = this.activation;
+	    }
+
+	    return this.activation;
+	  },
+
+	  // back-propagate the error
+	  propagate: function(rate, target) {
+	    // error accumulator
+	    var error = 0;
+
+	    // whether or not this neuron is in the output layer
+	    var isOutput = typeof target != 'undefined';
+
+	    // output neurons get their error from the enviroment
+	    if (isOutput)
+	      this.error.responsibility = this.error.projected = target - this.activation; // Eq. 10
+
+	    else // the rest of the neuron compute their error responsibilities by backpropagation
+	    {
+	      // error responsibilities from all the connections projected from this neuron
+	      for (var id in this.connections.projected) {
+	        var connection = this.connections.projected[id];
+	        var neuron = connection.to;
+	        // Eq. 21
+	        error += neuron.error.responsibility * connection.gain * connection.weight;
+	      }
+
+	      // projected error responsibility
+	      this.error.projected = this.derivative * error;
+
+	      error = 0;
+	      // error responsibilities from all the connections gated by this neuron
+	      for (var id in this.trace.extended) {
+	        var neuron = this.neighboors[id]; // gated neuron
+	        var influence = neuron.selfconnection.gater == this ? neuron.old : 0; // if gated neuron's selfconnection is gated by this neuron
+
+	        // index runs over all the connections to the gated neuron that are gated by this neuron
+	        for (var input in this.trace.influences[id]) { // captures the effect that the input connection of this neuron have, on a neuron which its input/s is/are gated by this neuron
+	          influence += this.trace.influences[id][input].weight * this.trace.influences[
+	            neuron.ID][input].from.activation;
+	        }
+	        // eq. 22
+	        error += neuron.error.responsibility * influence;
+	      }
+
+	      // gated error responsibility
+	      this.error.gated = this.derivative * error;
+
+	      // error responsibility - Eq. 23
+	      this.error.responsibility = this.error.projected + this.error.gated;
+	    }
+
+	    // learning rate
+	    rate = rate || .1;
+
+	    // adjust all the neuron's incoming connections
+	    for (var id in this.connections.inputs) {
+	      var input = this.connections.inputs[id];
+
+	      // Eq. 24
+	      var gradient = this.error.projected * this.trace.elegibility[input.ID];
+	      for (var id in this.trace.extended) {
+	        var neuron = this.neighboors[id];
+	        gradient += neuron.error.responsibility * this.trace.extended[
+	          neuron.ID][input.ID];
+	      }
+	      input.weight += rate * gradient; // adjust weights - aka learn
+	    }
+
+	    // adjust bias
+	    this.bias += rate * this.error.responsibility;
+	  },
+
+	  project: function(neuron, weight) {
+	    // self-connection
+	    if (neuron == this) {
+	      this.selfconnection.weight = 1;
+	      return this.selfconnection;
+	    }
+
+	    // check if connection already exists
+	    var connected = this.connected(neuron);
+	    if (connected && connected.type == "projected") {
+	      // update connection
+	      if (typeof weight != 'undefined')
+	        connected.connection.weight = weight;
+	      // return existing connection
+	      return connected.connection;
+	    } else {
+	      // create a new connection
+	      var connection = new Neuron.connection(this, neuron, weight);
+	    }
+
+	    // reference all the connections and traces
+	    this.connections.projected[connection.ID] = connection;
+	    this.neighboors[neuron.ID] = neuron;
+	    neuron.connections.inputs[connection.ID] = connection;
+	    neuron.trace.elegibility[connection.ID] = 0;
+
+	    for (var id in neuron.trace.extended) {
+	      var trace = neuron.trace.extended[id];
+	      trace[connection.ID] = 0;
+	    }
+
+	    return connection;
+	  },
+
+	  gate: function(connection) {
+	    // add connection to gated list
+	    this.connections.gated[connection.ID] = connection;
+
+	    var neuron = connection.to;
+	    if (!(neuron.ID in this.trace.extended)) {
+	      // extended trace
+	      this.neighboors[neuron.ID] = neuron;
+	      var xtrace = this.trace.extended[neuron.ID] = {};
+	      for (var id in this.connections.inputs) {
+	        var input = this.connections.inputs[id];
+	        xtrace[input.ID] = 0;
+	      }
+	    }
+
+	    // keep track
+	    if (neuron.ID in this.trace.influences)
+	      this.trace.influences[neuron.ID].push(connection);
+	    else
+	      this.trace.influences[neuron.ID] = [connection];
+
+	    // set gater
+	    connection.gater = this;
+	  },
+
+	  // returns true or false whether the neuron is self-connected or not
+	  selfconnected: function() {
+	    return this.selfconnection.weight !== 0;
+	  },
+
+	  // returns true or false whether the neuron is connected to another neuron (parameter)
+	  connected: function(neuron) {
+	    var result = {
+	      type: null,
+	      connection: false
+	    };
+
+	    if (this == neuron) {
+	      if (this.selfconnected()) {
+	        result.type = 'selfconnection';
+	        result.connection = this.selfconnection;
+	        return result;
+	      } else
+	        return false;
+	    }
+
+	    for (var type in this.connections) {
+	      for (var connection in this.connections[type]) {
+	        var connection = this.connections[type][connection];
+	        if (connection.to == neuron) {
+	          result.type = type;
+	          result.connection = connection;
+	          return result;
+	        } else if (connection.from == neuron) {
+	          result.type = type;
+	          result.connection = connection;
+	          return result;
+	        }
+	      }
+	    }
+
+	    return false;
+	  },
+
+	  // clears all the traces (the neuron forgets it's context, but the connections remain intact)
+	  clear: function() {
+
+	    for (var trace in this.trace.elegibility)
+	      this.trace.elegibility[trace] = 0;
+
+	    for (var trace in this.trace.extended)
+	      for (var extended in this.trace.extended[trace])
+	        this.trace.extended[trace][extended] = 0;
+
+	    this.error.responsibility = this.error.projected = this.error.gated = 0;
+	  },
+
+	  // all the connections are randomized and the traces are cleared
+	  reset: function() {
+	    this.clear();
+
+	    for (var type in this.connections)
+	      for (var connection in this.connections[type])
+	        this.connections[type][connection].weight = Math.random() * .2 - .1;
+	    this.bias = Math.random() * .2 - .1;
+
+	    this.old = this.state = this.activation = 0;
+	  },
+
+	  // hardcodes the behaviour of the neuron into an optimized function
+	  optimize: function(optimized, layer) {
+
+	    optimized = optimized || {};
+	    var that = this;
+	    var store_activation = [];
+	    var store_trace = [];
+	    var store_propagation = [];
+	    var varID = optimized.memory || 0;
+	    var neurons = optimized.neurons || 1;
+	    var inputs = optimized.inputs || [];
+	    var targets = optimized.targets || [];
+	    var outputs = optimized.outputs || [];
+	    var variables = optimized.variables || {};
+	    var activation_sentences = optimized.activation_sentences || [];
+	    var trace_sentences = optimized.trace_sentences || [];
+	    var propagation_sentences = optimized.propagation_sentences || [];
+	    var layers = optimized.layers || { __count: 0, __neuron: 0 };
+
+	    // allocate sentences
+	    var allocate = function(store){
+	      var allocated = layer in layers && store[layers.__count];
+	      if (!allocated)
+	      {
+	        layers.__count = store.push([]) - 1;
+	        layers[layer] = layers.__count;
+	      }
+	    }
+	    allocate(activation_sentences);
+	    allocate(trace_sentences);
+	    allocate(propagation_sentences);
+	    var currentLayer = layers.__count;
+
+	    // get/reserve space in memory by creating a unique ID for a variablel
+	    var getVar = function() {
+	      var args = Array.prototype.slice.call(arguments);
+
+	      if (args.length == 1) {
+	        if (args[0] == 'target') {
+	          var id = 'target_' + targets.length;
+	          targets.push(varID);
+	        } else
+	          var id = args[0];
+	        if (id in variables)
+	          return variables[id];
+	        return variables[id] = {
+	          value: 0,
+	          id: varID++
+	        };
+	      } else {
+	        var extended = args.length > 2;
+	        if (extended)
+	          var value = args.pop();
+
+	        var unit = args.shift();
+	        var prop = args.pop();
+
+	        if (!extended)
+	          var value = unit[prop];
+
+	        var id = prop + '_';
+	        for (var property in args)
+	          id += args[property] + '_';
+	        id += unit.ID;
+	        if (id in variables)
+	          return variables[id];
+
+	        return variables[id] = {
+	          value: value,
+	          id: varID++
+	        };
+	      }
+	    };
+
+	    // build sentence
+	    var buildSentence = function() {
+	      var args = Array.prototype.slice.call(arguments);
+	      var store = args.pop();
+	      var sentence = "";
+	      for (var i in args)
+	        if (typeof args[i] == 'string')
+	          sentence += args[i];
+	        else
+	          sentence += 'F[' + args[i].id + ']';
+
+	      store.push(sentence + ';');
+	    }
+
+	    // helper to check if an object is empty
+	    var isEmpty = function(obj) {
+	      for (var prop in obj) {
+	        if (obj.hasOwnProperty(prop))
+	          return false;
+	      }
+	      return true;
+	    };
+
+	    // characteristics of the neuron
+	    var noProjections = isEmpty(this.connections.projected);
+	    var noGates = isEmpty(this.connections.gated);
+	    var isInput = layer == 'input' ? true : isEmpty(this.connections.inputs);
+	    var isOutput = layer == 'output' ? true : noProjections && noGates;
+
+	    // optimize neuron's behaviour
+	    var rate = getVar('rate');
+	    var activation = getVar(this, 'activation');
+	    if (isInput)
+	      inputs.push(activation.id);
+	    else {
+	      activation_sentences[currentLayer].push(store_activation);
+	      trace_sentences[currentLayer].push(store_trace);
+	      propagation_sentences[currentLayer].push(store_propagation);
+	      var old = getVar(this, 'old');
+	      var state = getVar(this, 'state');
+	      var bias = getVar(this, 'bias');
+	      if (this.selfconnection.gater)
+	        var self_gain = getVar(this.selfconnection, 'gain');
+	      if (this.selfconnected())
+	        var self_weight = getVar(this.selfconnection, 'weight');
+	      buildSentence(old, ' = ', state, store_activation);
+	      if (this.selfconnected())
+	        if (this.selfconnection.gater)
+	          buildSentence(state, ' = ', self_gain, ' * ', self_weight, ' * ',
+	            state, ' + ', bias, store_activation);
+	        else
+	          buildSentence(state, ' = ', self_weight, ' * ', state, ' + ',
+	            bias, store_activation);
+	      else
+	        buildSentence(state, ' = ', bias, store_activation);
+	      for (var i in this.connections.inputs) {
+	        var input = this.connections.inputs[i];
+	        var input_activation = getVar(input.from, 'activation');
+	        var input_weight = getVar(input, 'weight');
+	        if (input.gater)
+	          var input_gain = getVar(input, 'gain');
+	        if (this.connections.inputs[i].gater)
+	          buildSentence(state, ' += ', input_activation, ' * ',
+	            input_weight, ' * ', input_gain, store_activation);
+	        else
+	          buildSentence(state, ' += ', input_activation, ' * ',
+	            input_weight, store_activation);
+	      }
+	      var derivative = getVar(this, 'derivative');
+	      switch (this.squash) {
+	        case Neuron.squash.LOGISTIC:
+	          buildSentence(activation, ' = (1 / (1 + Math.exp(-', state, ')))',
+	            store_activation);
+	          buildSentence(derivative, ' = ', activation, ' * (1 - ',
+	            activation, ')', store_activation);
+	          break;
+	        case Neuron.squash.TANH:
+	          var eP = getVar('aux');
+	          var eN = getVar('aux_2');
+	          buildSentence(eP, ' = Math.exp(', state, ')', store_activation);
+	          buildSentence(eN, ' = 1 / ', eP, store_activation);
+	          buildSentence(activation, ' = (', eP, ' - ', eN, ') / (', eP, ' + ', eN, ')', store_activation);
+	          buildSentence(derivative, ' = 1 - (', activation, ' * ', activation, ')', store_activation);
+	          break;
+	        case Neuron.squash.IDENTITY:
+	          buildSentence(activation, ' = ', state, store_activation);
+	          buildSentence(derivative, ' = 1', store_activation);
+	          break;
+	        case Neuron.squash.HLIM:
+	          buildSentence(activation, ' = +(', state, ' > 0)', store_activation);
+	          buildSentence(derivative, ' = 1', store_activation);
+	        case Neuron.squash.RELU:
+	          buildSentence(activation, ' = ', state, ' > 0 ? ', state, ' : 0', store_activation);
+	          buildSentence(derivative, ' = ', state, ' > 0 ? 1 : 0', store_activation);
+	          break;
+	      }
+
+	      for (var id in this.trace.extended) {
+	        // calculate extended elegibility traces in advance
+
+	        var xtrace = this.trace.extended[id];
+	        var neuron = this.neighboors[id];
+	        var influence = getVar('influences[' + neuron.ID + ']');
+	        var neuron_old = getVar(neuron, 'old');
+	        var initialized = false;
+	        if (neuron.selfconnection.gater == this)
+	        {
+	          buildSentence(influence, ' = ', neuron_old, store_trace);
+	          initialized = true;
+	        }
+	        for (var incoming in this.trace.influences[neuron.ID]) {
+	          var incoming_weight = getVar(this.trace.influences[neuron.ID]
+	            [incoming], 'weight');
+	          var incoming_activation = getVar(this.trace.influences[neuron.ID]
+	            [incoming].from, 'activation');
+
+	          if (initialized)
+	            buildSentence(influence, ' += ', incoming_weight, ' * ', incoming_activation, store_trace);
+	          else {
+	            buildSentence(influence, ' = ', incoming_weight, ' * ', incoming_activation, store_trace);
+	            initialized = true;
+	          }
+	        }
+	      }
+
+	      for (var i in this.connections.inputs) {
+	        var input = this.connections.inputs[i];
+	        if (input.gater)
+	          var input_gain = getVar(input, 'gain');
+	        var input_activation = getVar(input.from, 'activation');
+	        var trace = getVar(this, 'trace', 'elegibility', input.ID, this.trace
+	          .elegibility[input.ID]);
+	        if (this.selfconnected()) {
+	          if (this.selfconnection.gater) {
+	            if (input.gater)
+	              buildSentence(trace, ' = ', self_gain, ' * ', self_weight,
+	                ' * ', trace, ' + ', input_gain, ' * ', input_activation,
+	                store_trace);
+	            else
+	              buildSentence(trace, ' = ', self_gain, ' * ', self_weight,
+	                ' * ', trace, ' + ', input_activation, store_trace);
+	          } else {
+	            if (input.gater)
+	              buildSentence(trace, ' = ', self_weight, ' * ', trace, ' + ',
+	                input_gain, ' * ', input_activation, store_trace);
+	            else
+	              buildSentence(trace, ' = ', self_weight, ' * ', trace, ' + ',
+	                input_activation, store_trace);
+	          }
+	        } else {
+	          if (input.gater)
+	            buildSentence(trace, ' = ', input_gain, ' * ', input_activation,
+	              store_trace);
+	          else
+	            buildSentence(trace, ' = ', input_activation, store_trace);
+	        }
+	        for (var id in this.trace.extended) {
+	          // extended elegibility trace
+	          var xtrace = this.trace.extended[id];
+	          var neuron = this.neighboors[id];
+	          var influence = getVar('influences[' + neuron.ID + ']');
+	          var neuron_old = getVar(neuron, 'old');
+
+	          var trace = getVar(this, 'trace', 'elegibility', input.ID, this.trace
+	            .elegibility[input.ID]);
+	          var xtrace = getVar(this, 'trace', 'extended', neuron.ID, input.ID,
+	            this.trace.extended[neuron.ID][input.ID]);
+	          if (neuron.selfconnected())
+	            var neuron_self_weight = getVar(neuron.selfconnection, 'weight');
+	          if (neuron.selfconnection.gater)
+	            var neuron_self_gain = getVar(neuron.selfconnection, 'gain');
+	          if (neuron.selfconnected())
+	            if (neuron.selfconnection.gater)
+	              buildSentence(xtrace, ' = ', neuron_self_gain, ' * ',
+	                neuron_self_weight, ' * ', xtrace, ' + ', derivative, ' * ',
+	                trace, ' * ', influence, store_trace);
+	            else
+	              buildSentence(xtrace, ' = ', neuron_self_weight, ' * ',
+	                xtrace, ' + ', derivative, ' * ', trace, ' * ',
+	                influence, store_trace);
+	          else
+	            buildSentence(xtrace, ' = ', derivative, ' * ', trace, ' * ',
+	              influence, store_trace);
+	        }
+	      }
+	      for (var connection in this.connections.gated) {
+	        var gated_gain = getVar(this.connections.gated[connection], 'gain');
+	        buildSentence(gated_gain, ' = ', activation, store_activation);
+	      }
+	    }
+	    if (!isInput) {
+	      var responsibility = getVar(this, 'error', 'responsibility', this.error
+	        .responsibility);
+	      if (isOutput) {
+	        var target = getVar('target');
+	        buildSentence(responsibility, ' = ', target, ' - ', activation,
+	          store_propagation);
+	        for (var id in this.connections.inputs) {
+	          var input = this.connections.inputs[id];
+	          var trace = getVar(this, 'trace', 'elegibility', input.ID, this.trace
+	            .elegibility[input.ID]);
+	          var input_weight = getVar(input, 'weight');
+	          buildSentence(input_weight, ' += ', rate, ' * (', responsibility,
+	            ' * ', trace, ')', store_propagation);
+	        }
+	        outputs.push(activation.id);
+	      } else {
+	        if (!noProjections && !noGates) {
+	          var error = getVar('aux');
+	          for (var id in this.connections.projected) {
+	            var connection = this.connections.projected[id];
+	            var neuron = connection.to;
+	            var connection_weight = getVar(connection, 'weight');
+	            var neuron_responsibility = getVar(neuron, 'error',
+	              'responsibility', neuron.error.responsibility);
+	            if (connection.gater) {
+	              var connection_gain = getVar(connection, 'gain');
+	              buildSentence(error, ' += ', neuron_responsibility, ' * ',
+	                connection_gain, ' * ', connection_weight,
+	                store_propagation);
+	            } else
+	              buildSentence(error, ' += ', neuron_responsibility, ' * ',
+	                connection_weight, store_propagation);
+	          }
+	          var projected = getVar(this, 'error', 'projected', this.error.projected);
+	          buildSentence(projected, ' = ', derivative, ' * ', error,
+	            store_propagation);
+	          buildSentence(error, ' = 0', store_propagation);
+	          for (var id in this.trace.extended) {
+	            var neuron = this.neighboors[id];
+	            var influence = getVar('aux_2');
+	            var neuron_old = getVar(neuron, 'old');
+	            if (neuron.selfconnection.gater == this)
+	              buildSentence(influence, ' = ', neuron_old, store_propagation);
+	            else
+	              buildSentence(influence, ' = 0', store_propagation);
+	            for (var input in this.trace.influences[neuron.ID]) {
+	              var connection = this.trace.influences[neuron.ID][input];
+	              var connection_weight = getVar(connection, 'weight');
+	              var neuron_activation = getVar(connection.from, 'activation');
+	              buildSentence(influence, ' += ', connection_weight, ' * ',
+	                neuron_activation, store_propagation);
+	            }
+	            var neuron_responsibility = getVar(neuron, 'error',
+	              'responsibility', neuron.error.responsibility);
+	            buildSentence(error, ' += ', neuron_responsibility, ' * ',
+	              influence, store_propagation);
+	          }
+	          var gated = getVar(this, 'error', 'gated', this.error.gated);
+	          buildSentence(gated, ' = ', derivative, ' * ', error,
+	            store_propagation);
+	          buildSentence(responsibility, ' = ', projected, ' + ', gated,
+	            store_propagation);
+	          for (var id in this.connections.inputs) {
+	            var input = this.connections.inputs[id];
+	            var gradient = getVar('aux');
+	            var trace = getVar(this, 'trace', 'elegibility', input.ID, this
+	              .trace.elegibility[input.ID]);
+	            buildSentence(gradient, ' = ', projected, ' * ', trace,
+	              store_propagation);
+	            for (var id in this.trace.extended) {
+	              var neuron = this.neighboors[id];
+	              var neuron_responsibility = getVar(neuron, 'error',
+	                'responsibility', neuron.error.responsibility);
+	              var xtrace = getVar(this, 'trace', 'extended', neuron.ID,
+	                input.ID, this.trace.extended[neuron.ID][input.ID]);
+	              buildSentence(gradient, ' += ', neuron_responsibility, ' * ',
+	                xtrace, store_propagation);
+	            }
+	            var input_weight = getVar(input, 'weight');
+	            buildSentence(input_weight, ' += ', rate, ' * ', gradient,
+	              store_propagation);
+	          }
+
+	        } else if (noGates) {
+	          buildSentence(responsibility, ' = 0', store_propagation);
+	          for (var id in this.connections.projected) {
+	            var connection = this.connections.projected[id];
+	            var neuron = connection.to;
+	            var connection_weight = getVar(connection, 'weight');
+	            var neuron_responsibility = getVar(neuron, 'error',
+	              'responsibility', neuron.error.responsibility);
+	            if (connection.gater) {
+	              var connection_gain = getVar(connection, 'gain');
+	              buildSentence(responsibility, ' += ', neuron_responsibility,
+	                ' * ', connection_gain, ' * ', connection_weight,
+	                store_propagation);
+	            } else
+	              buildSentence(responsibility, ' += ', neuron_responsibility,
+	                ' * ', connection_weight, store_propagation);
+	          }
+	          buildSentence(responsibility, ' *= ', derivative,
+	            store_propagation);
+	          for (var id in this.connections.inputs) {
+	            var input = this.connections.inputs[id];
+	            var trace = getVar(this, 'trace', 'elegibility', input.ID, this
+	              .trace.elegibility[input.ID]);
+	            var input_weight = getVar(input, 'weight');
+	            buildSentence(input_weight, ' += ', rate, ' * (',
+	              responsibility, ' * ', trace, ')', store_propagation);
+	          }
+	        } else if (noProjections) {
+	          buildSentence(responsibility, ' = 0', store_propagation);
+	          for (var id in this.trace.extended) {
+	            var neuron = this.neighboors[id];
+	            var influence = getVar('aux');
+	            var neuron_old = getVar(neuron, 'old');
+	            if (neuron.selfconnection.gater == this)
+	              buildSentence(influence, ' = ', neuron_old, store_propagation);
+	            else
+	              buildSentence(influence, ' = 0', store_propagation);
+	            for (var input in this.trace.influences[neuron.ID]) {
+	              var connection = this.trace.influences[neuron.ID][input];
+	              var connection_weight = getVar(connection, 'weight');
+	              var neuron_activation = getVar(connection.from, 'activation');
+	              buildSentence(influence, ' += ', connection_weight, ' * ',
+	                neuron_activation, store_propagation);
+	            }
+	            var neuron_responsibility = getVar(neuron, 'error',
+	              'responsibility', neuron.error.responsibility);
+	            buildSentence(responsibility, ' += ', neuron_responsibility,
+	              ' * ', influence, store_propagation);
+	          }
+	          buildSentence(responsibility, ' *= ', derivative,
+	            store_propagation);
+	          for (var id in this.connections.inputs) {
+	            var input = this.connections.inputs[id];
+	            var gradient = getVar('aux');
+	            buildSentence(gradient, ' = 0', store_propagation);
+	            for (var id in this.trace.extended) {
+	              var neuron = this.neighboors[id];
+	              var neuron_responsibility = getVar(neuron, 'error',
+	                'responsibility', neuron.error.responsibility);
+	              var xtrace = getVar(this, 'trace', 'extended', neuron.ID,
+	                input.ID, this.trace.extended[neuron.ID][input.ID]);
+	              buildSentence(gradient, ' += ', neuron_responsibility, ' * ',
+	                xtrace, store_propagation);
+	            }
+	            var input_weight = getVar(input, 'weight');
+	            buildSentence(input_weight, ' += ', rate, ' * ', gradient,
+	              store_propagation);
+	          }
+	        }
+	      }
+	      buildSentence(bias, ' += ', rate, ' * ', responsibility,
+	        store_propagation);
+	    }
+	    return {
+	      memory: varID,
+	      neurons: neurons + 1,
+	      inputs: inputs,
+	      outputs: outputs,
+	      targets: targets,
+	      variables: variables,
+	      activation_sentences: activation_sentences,
+	      trace_sentences: trace_sentences,
+	      propagation_sentences: propagation_sentences,
+	      layers: layers
+	    }
+	  }
+	}
+
+
+	// represents a connection between two neurons
+	Neuron.connection = function Connection(from, to, weight) {
+
+	  if (!from || !to)
+	    throw new Error("Connection Error: Invalid neurons");
+
+	  this.ID = Neuron.connection.uid();
+	  this.from = from;
+	  this.to = to;
+	  this.weight = typeof weight == 'undefined' ? Math.random() * .2 - .1 :
+	    weight;
+	  this.gain = 1;
+	  this.gater = null;
+	}
+
+
+	// squashing functions
+	Neuron.squash = {};
+
+	// eq. 5 & 5'
+	Neuron.squash.LOGISTIC = function(x, derivate) {
+	  if (!derivate)
+	    return 1 / (1 + Math.exp(-x));
+	  var fx = Neuron.squash.LOGISTIC(x);
+	  return fx * (1 - fx);
+	};
+	Neuron.squash.TANH = function(x, derivate) {
+	  if (derivate)
+	    return 1 - Math.pow(Neuron.squash.TANH(x), 2);
+	  var eP = Math.exp(x);
+	  var eN = 1 / eP;
+	  return (eP - eN) / (eP + eN);
+	};
+	Neuron.squash.IDENTITY = function(x, derivate) {
+	  return derivate ? 1 : x;
+	};
+	Neuron.squash.HLIM = function(x, derivate) {
+	  return derivate ? 1 : x > 0 ? 1 : 0;
+	};
+	Neuron.squash.RELU = function(x, derivate) {
+	  if (derivate)
+	    return x > 0 ? 1 : 0;
+	  return x > 0 ? x : 0;
+	};
+
+	// unique ID's
+	(function() {
+	  var neurons = 0;
+	  var connections = 0;
+	  Neuron.uid = function() {
+	    return neurons++;
+	  }
+	  Neuron.connection.uid = function() {
+	    return connections++;
+	  }
+	  Neuron.quantity = function() {
+	    return {
+	      neurons: neurons,
+	      connections: connections
+	    }
+	  }
+	})();
+
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)(module)))
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	module.exports = function(module) {
+		if(!module.webpackPolyfill) {
+			module.deprecate = function() {};
+			module.paths = [];
+			// module.parent = undefined by default
+			module.children = [];
+			module.webpackPolyfill = 1;
+		}
+		return module;
+	}
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(module) {// export
+	if (module) module.exports = Layer;
+
+	// import
+	var Neuron  = __webpack_require__(4)
+	,   Network = __webpack_require__(7)
+
+	/*******************************************************************************************
+	                                            LAYER
+	*******************************************************************************************/
+
+	function Layer(size, label) {
+	  this.size = size | 0;
+	  this.list = [];
+	  this.label = label || null;
+	  this.connectedTo = [];
+
+	  while (size--) {
+	    var neuron = new Neuron();
+	    this.list.push(neuron);
+	  }
+	}
+
+	Layer.prototype = {
+
+	  // activates all the neurons in the layer
+	  activate: function(input) {
+
+	    var activations = [];
+
+	    if (typeof input != 'undefined') {
+	      if (input.length != this.size)
+	        throw new Error("INPUT size and LAYER size must be the same to activate!");
+
+	      for (var id in this.list) {
+	        var neuron = this.list[id];
+	        var activation = neuron.activate(input[id]);
+	        activations.push(activation);
+	      }
+	    } else {
+	      for (var id in this.list) {
+	        var neuron = this.list[id];
+	        var activation = neuron.activate();
+	        activations.push(activation);
+	      }
+	    }
+	    return activations;
+	  },
+
+	  // propagates the error on all the neurons of the layer
+	  propagate: function(rate, target) {
+
+	    if (typeof target != 'undefined') {
+	      if (target.length != this.size)
+	        throw new Error("TARGET size and LAYER size must be the same to propagate!");
+
+	      for (var id = this.list.length - 1; id >= 0; id--) {
+	        var neuron = this.list[id];
+	        neuron.propagate(rate, target[id]);
+	      }
+	    } else {
+	      for (var id = this.list.length - 1; id >= 0; id--) {
+	        var neuron = this.list[id];
+	        neuron.propagate(rate);
+	      }
+	    }
+	  },
+
+	  // projects a connection from this layer to another one
+	  project: function(layer, type, weights) {
+
+	    if (layer instanceof Network)
+	      layer = layer.layers.input;
+
+	    if (layer instanceof Layer) {
+	      if (!this.connected(layer))
+	        return new Layer.connection(this, layer, type, weights);
+	    } else
+	      throw new Error("Invalid argument, you can only project connections to LAYERS and NETWORKS!");
+
+
+	  },
+
+	  // gates a connection betwenn two layers
+	  gate: function(connection, type) {
+
+	    if (type == Layer.gateType.INPUT) {
+	      if (connection.to.size != this.size)
+	        throw new Error("GATER layer and CONNECTION.TO layer must be the same size in order to gate!");
+
+	      for (var id in connection.to.list) {
+	        var neuron = connection.to.list[id];
+	        var gater = this.list[id];
+	        for (var input in neuron.connections.inputs) {
+	          var gated = neuron.connections.inputs[input];
+	          if (gated.ID in connection.connections)
+	            gater.gate(gated);
+	        }
+	      }
+	    } else if (type == Layer.gateType.OUTPUT) {
+	      if (connection.from.size != this.size)
+	        throw new Error("GATER layer and CONNECTION.FROM layer must be the same size in order to gate!");
+
+	      for (var id in connection.from.list) {
+	        var neuron = connection.from.list[id];
+	        var gater = this.list[id];
+	        for (var projected in neuron.connections.projected) {
+	          var gated = neuron.connections.projected[projected];
+	          if (gated.ID in connection.connections)
+	            gater.gate(gated);
+	        }
+	      }
+	    } else if (type == Layer.gateType.ONE_TO_ONE) {
+	      if (connection.size != this.size)
+	        throw new Error("The number of GATER UNITS must be the same as the number of CONNECTIONS to gate!");
+
+	      for (var id in connection.list) {
+	        var gater = this.list[id];
+	        var gated = connection.list[id];
+	        gater.gate(gated);
+	      }
+	    }
+	    connection.gatedfrom.push({layer: this, type: type});
+	  },
+
+	  // true or false whether the whole layer is self-connected or not
+	  selfconnected: function() {
+
+	    for (var id in this.list) {
+	      var neuron = this.list[id];
+	      if (!neuron.selfconnected())
+	        return false;
+	    }
+	    return true;
+	  },
+
+	  // true of false whether the layer is connected to another layer (parameter) or not
+	  connected: function(layer) {
+	    // Check if ALL to ALL connection
+	    var connections = 0;
+	    for (var here in this.list) {
+	      for (var there in layer.list) {
+	        var from = this.list[here];
+	        var to = layer.list[there];
+	        var connected = from.connected(to);
+	        if (connected.type == 'projected')
+	          connections++;
+	      }
+	    }
+	    if (connections == this.size * layer.size)
+	      return Layer.connectionType.ALL_TO_ALL;
+
+	    // Check if ONE to ONE connection
+	    connections = 0;
+	    for (var neuron in this.list) {
+	      var from = this.list[neuron];
+	      var to = layer.list[neuron];
+	      var connected = from.connected(to);
+	      if (connected.type == 'projected')
+	        connections++;
+	    }
+	    if (connections == this.size)
+	      return Layer.connectionType.ONE_TO_ONE;
+	  },
+
+	  // clears all the neuorns in the layer
+	  clear: function() {
+	    for (var id in this.list) {
+	      var neuron = this.list[id];
+	      neuron.clear();
+	    }
+	  },
+
+	  // resets all the neurons in the layer
+	  reset: function() {
+	    for (var id in this.list) {
+	      var neuron = this.list[id];
+	      neuron.reset();
+	    }
+	  },
+
+	  // returns all the neurons in the layer (array)
+	  neurons: function() {
+	    return this.list;
+	  },
+
+	  // adds a neuron to the layer
+	  add: function(neuron) {
+	    this.neurons[neuron.ID] = neuron || new Neuron();
+	    this.list.push(neuron);
+	    this.size++;
+	  },
+
+	  set: function(options) {
+	    options = options || {};
+
+	    for (var i in this.list) {
+	      var neuron = this.list[i];
+	      if (options.label)
+	        neuron.label = options.label + '_' + neuron.ID;
+	      if (options.squash)
+	        neuron.squash = options.squash;
+	      if (options.bias)
+	        neuron.bias = options.bias;
+	    }
+	    return this;
+	  }
+	}
+
+	// represents a connection from one layer to another, and keeps track of its weight and gain
+	Layer.connection = function LayerConnection(fromLayer, toLayer, type, weights) {
+	  this.ID = Layer.connection.uid();
+	  this.from = fromLayer;
+	  this.to = toLayer;
+	  this.selfconnection = toLayer == fromLayer;
+	  this.type = type;
+	  this.connections = {};
+	  this.list = [];
+	  this.size = 0;
+	  this.gatedfrom = [];
+
+	  if (typeof this.type == 'undefined')
+	  {
+	    if (fromLayer == toLayer)
+	      this.type = Layer.connectionType.ONE_TO_ONE;
+	    else
+	      this.type = Layer.connectionType.ALL_TO_ALL;
+	  }
+
+	  if (this.type == Layer.connectionType.ALL_TO_ALL ||
+	      this.type == Layer.connectionType.ALL_TO_ELSE) {
+	    for (var here in this.from.list) {
+	      for (var there in this.to.list) {
+	        var from = this.from.list[here];
+	        var to = this.to.list[there];
+	        if(this.type == Layer.connectionType.ALL_TO_ELSE && from == to)
+	          continue;
+	        var connection = from.project(to, weights);
+
+	        this.connections[connection.ID] = connection;
+	        this.size = this.list.push(connection);
+	      }
+	    }
+	  } else if (this.type == Layer.connectionType.ONE_TO_ONE) {
+
+	    for (var neuron in this.from.list) {
+	      var from = this.from.list[neuron];
+	      var to = this.to.list[neuron];
+	      var connection = from.project(to, weights);
+
+	      this.connections[connection.ID] = connection;
+	      this.size = this.list.push(connection);
+	    }
+	  }
+
+	  fromLayer.connectedTo.push(this);
+	}
+
+	// types of connections
+	Layer.connectionType = {};
+	Layer.connectionType.ALL_TO_ALL = "ALL TO ALL";
+	Layer.connectionType.ONE_TO_ONE = "ONE TO ONE";
+	Layer.connectionType.ALL_TO_ELSE = "ALL TO ELSE";
+
+	// types of gates
+	Layer.gateType = {};
+	Layer.gateType.INPUT = "INPUT";
+	Layer.gateType.OUTPUT = "OUTPUT";
+	Layer.gateType.ONE_TO_ONE = "ONE TO ONE";
+
+	(function() {
+	  var connections = 0;
+	  Layer.connection.uid = function() {
+	    return connections++;
+	  }
+	})();
+
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)(module)))
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(module) {// export
+	if (module) module.exports = Network;
+
+	// import
+	var Neuron  = __webpack_require__(4)
+	,   Layer   = __webpack_require__(6)
+
+	/*******************************************************************************************
+	                                         NETWORK
+	*******************************************************************************************/
+
+	function Network(layers) {
+	  if (typeof layers != 'undefined') {
+	    this.layers = layers || {
+	      input: null,
+	      hidden: {},
+	      output: null
+	    };
+	    this.optimized = null;
+	  }
+	}
+	Network.prototype = {
+
+	  // feed-forward activation of all the layers to produce an ouput
+	  activate: function(input) {
+
+	    if (this.optimized === false)
+	    {
+	      this.layers.input.activate(input);
+	      for (var layer in this.layers.hidden)
+	        this.layers.hidden[layer].activate();
+	      return this.layers.output.activate();
+	    }
+	    else
+	    {
+	      if (this.optimized == null)
+	        this.optimize();
+	      return this.optimized.activate(input);
+	    }
+	  },
+
+	  // back-propagate the error thru the network
+	  propagate: function(rate, target) {
+
+	    if (this.optimized === false)
+	    {
+	      this.layers.output.propagate(rate, target);
+	      var reverse = [];
+	      for (var layer in this.layers.hidden)
+	        reverse.push(this.layers.hidden[layer]);
+	      reverse.reverse();
+	      for (var layer in reverse)
+	        reverse[layer].propagate(rate);
+	    }
+	    else
+	    {
+	      if (this.optimized == null)
+	        this.optimize();
+	      this.optimized.propagate(rate, target);
+	    }
+	  },
+
+	  // project a connection to another unit (either a network or a layer)
+	  project: function(unit, type, weights) {
+
+	    if (this.optimized)
+	      this.optimized.reset();
+
+	    if (unit instanceof Network)
+	      return this.layers.output.project(unit.layers.input, type, weights);
+
+	    if (unit instanceof Layer)
+	      return this.layers.output.project(unit, type, weights);
+
+	    throw new Error("Invalid argument, you can only project connections to LAYERS and NETWORKS!");
+	  },
+
+	  // let this network gate a connection
+	  gate: function(connection, type) {
+	    if (this.optimized)
+	      this.optimized.reset();
+	    this.layers.output.gate(connection, type);
+	  },
+
+	  // clear all elegibility traces and extended elegibility traces (the network forgets its context, but not what was trained)
+	  clear: function() {
+
+	    this.restore();
+
+	    var inputLayer = this.layers.input,
+	      outputLayer = this.layers.output;
+
+	    inputLayer.clear();
+	    for (var layer in this.layers.hidden) {
+	      var hiddenLayer = this.layers.hidden[layer];
+	      hiddenLayer.clear();
+	    }
+	    outputLayer.clear();
+
+	    if (this.optimized)
+	      this.optimized.reset();
+	  },
+
+	  // reset all weights and clear all traces (ends up like a new network)
+	  reset: function() {
+
+	    this.restore();
+
+	    var inputLayer = this.layers.input,
+	      outputLayer = this.layers.output;
+
+	    inputLayer.reset();
+	    for (var layer in this.layers.hidden) {
+	      var hiddenLayer = this.layers.hidden[layer];
+	      hiddenLayer.reset();
+	    }
+	    outputLayer.reset();
+
+	    if (this.optimized)
+	      this.optimized.reset();
+	  },
+
+	  // hardcodes the behaviour of the whole network into a single optimized function
+	  optimize: function() {
+
+	    var that = this;
+	    var optimized = {};
+	    var neurons = this.neurons();
+
+	    for (var i in neurons) {
+	      var neuron = neurons[i].neuron;
+	      var layer = neurons[i].layer;
+	      while (neuron.neuron)
+	        neuron = neuron.neuron;
+	      optimized = neuron.optimize(optimized, layer);
+	    }
+	    for (var i in optimized.propagation_sentences)
+	      optimized.propagation_sentences[i].reverse();
+	    optimized.propagation_sentences.reverse();
+
+	    var hardcode = "";
+	    hardcode += "var F = Float64Array ? new Float64Array(" + optimized.memory +
+	      ") : []; ";
+	    for (var i in optimized.variables)
+	      hardcode += "F[" + optimized.variables[i].id + "] = " + (optimized.variables[
+	        i].value || 0) + "; ";
+	    hardcode += "var activate = function(input){\n";
+	    for (var i in optimized.inputs)
+	      hardcode += "F[" + optimized.inputs[i] + "] = input[" + i + "]; ";
+	    for (var currentLayer in optimized.activation_sentences) {
+	      if (optimized.activation_sentences[currentLayer].length > 0) {
+	        for (var currentNeuron in optimized.activation_sentences[currentLayer]) {
+	          hardcode += optimized.activation_sentences[currentLayer][currentNeuron].join(" ");
+	          hardcode += optimized.trace_sentences[currentLayer][currentNeuron].join(" ");
+	        }
+	      }
+	    }
+	    hardcode += " var output = []; "
+	    for (var i in optimized.outputs)
+	      hardcode += "output[" + i + "] = F[" + optimized.outputs[i] + "]; ";
+	    hardcode += "return output; }; "
+	    hardcode += "var propagate = function(rate, target){\n";
+	    hardcode += "F[" + optimized.variables.rate.id + "] = rate; ";
+	    for (var i in optimized.targets)
+	      hardcode += "F[" + optimized.targets[i] + "] = target[" + i + "]; ";
+	    for (var currentLayer in optimized.propagation_sentences)
+	      for (var currentNeuron in optimized.propagation_sentences[currentLayer])
+	        hardcode += optimized.propagation_sentences[currentLayer][currentNeuron].join(" ") + " ";
+	    hardcode += " };\n";
+	    hardcode +=
+	      "var ownership = function(memoryBuffer){\nF = memoryBuffer;\nthis.memory = F;\n};\n";
+	    hardcode +=
+	      "return {\nmemory: F,\nactivate: activate,\npropagate: propagate,\nownership: ownership\n};";
+	    hardcode = hardcode.split(";").join(";\n");
+
+	    var constructor = new Function(hardcode);
+
+	    var network = constructor();
+	    network.data = {
+	      variables: optimized.variables,
+	      activate: optimized.activation_sentences,
+	      propagate: optimized.propagation_sentences,
+	      trace: optimized.trace_sentences,
+	      inputs: optimized.inputs,
+	      outputs: optimized.outputs,
+	      check_activation: this.activate,
+	      check_propagation: this.propagate
+	    }
+
+	    network.reset = function() {
+	      if (that.optimized) {
+	        that.optimized = null;
+	        that.activate = network.data.check_activation;
+	        that.propagate = network.data.check_propagation;
+	      }
+	    }
+
+	    this.optimized = network;
+	    this.activate = network.activate;
+	    this.propagate = network.propagate;
+	  },
+
+	  // restores all the values from the optimized network the their respective objects in order to manipulate the network
+	  restore: function() {
+	    if (!this.optimized)
+	      return;
+
+	    var optimized = this.optimized;
+
+	    var getValue = function() {
+	      var args = Array.prototype.slice.call(arguments);
+
+	      var unit = args.shift();
+	      var prop = args.pop();
+
+	      var id = prop + '_';
+	      for (var property in args)
+	        id += args[property] + '_';
+	      id += unit.ID;
+
+	      var memory = optimized.memory;
+	      var variables = optimized.data.variables;
+
+	      if (id in variables)
+	        return memory[variables[id].id];
+	      return 0;
+	    }
+
+	    var list = this.neurons();
+
+	    // link id's to positions in the array
+	    var ids = {};
+	    for (var i in list) {
+	      var neuron = list[i].neuron;
+	      while (neuron.neuron)
+	        neuron = neuron.neuron;
+
+	      neuron.state = getValue(neuron, 'state');
+	      neuron.old = getValue(neuron, 'old');
+	      neuron.activation = getValue(neuron, 'activation');
+	      neuron.bias = getValue(neuron, 'bias');
+
+	      for (var input in neuron.trace.elegibility)
+	        neuron.trace.elegibility[input] = getValue(neuron, 'trace',
+	          'elegibility', input);
+
+	      for (var gated in neuron.trace.extended)
+	        for (var input in neuron.trace.extended[gated])
+	          neuron.trace.extended[gated][input] = getValue(neuron, 'trace',
+	            'extended', gated, input);
+	    }
+
+	    // get connections
+	    for (var i in list) {
+	      var neuron = list[i].neuron;
+	      while (neuron.neuron)
+	        neuron = neuron.neuron;
+
+	      for (var j in neuron.connections.projected) {
+	        var connection = neuron.connections.projected[j];
+	        connection.weight = getValue(connection, 'weight');
+	        connection.gain = getValue(connection, 'gain');
+	      }
+	    }
+	  },
+
+	  // returns all the neurons in the network
+	  neurons: function() {
+
+	    var neurons = [];
+
+	    var inputLayer = this.layers.input.neurons(),
+	      outputLayer = this.layers.output.neurons();
+
+	    for (var neuron in inputLayer)
+	      neurons.push({
+	        neuron: inputLayer[neuron],
+	        layer: 'input'
+	      });
+
+	    for (var layer in this.layers.hidden) {
+	      var hiddenLayer = this.layers.hidden[layer].neurons();
+	      for (var neuron in hiddenLayer)
+	        neurons.push({
+	          neuron: hiddenLayer[neuron],
+	          layer: layer
+	        });
+	    }
+	    for (var neuron in outputLayer)
+	      neurons.push({
+	        neuron: outputLayer[neuron],
+	        layer: 'output'
+	      });
+
+	    return neurons;
+	  },
+
+	  // returns number of inputs of the network
+	  inputs: function() {
+	    return this.layers.input.size;
+	  },
+
+	  // returns number of outputs of hte network
+	  outputs: function() {
+	    return this.layers.output.size;
+	  },
+
+	  // sets the layers of the network
+	  set: function(layers) {
+
+	    this.layers = layers;
+	    if (this.optimized)
+	      this.optimized.reset();
+	  },
+
+	  setOptimize: function(bool){
+	    this.restore();
+	    if (this.optimized)
+	      this.optimized.reset();
+	    this.optimized = bool? null : false;
+	  },
+
+	  // returns a json that represents all the neurons and connections of the network
+	  toJSON: function(ignoreTraces) {
+
+	    this.restore();
+
+	    var list = this.neurons();
+	    var neurons = [];
+	    var connections = [];
+
+	    // link id's to positions in the array
+	    var ids = {};
+	    for (var i in list) {
+	      var neuron = list[i].neuron;
+	      while (neuron.neuron)
+	        neuron = neuron.neuron;
+	      ids[neuron.ID] = i;
+
+	      var copy = {
+	        trace: {
+	          elegibility: {},
+	          extended: {}
+	        },
+	        state: neuron.state,
+	        old: neuron.old,
+	        activation: neuron.activation,
+	        bias: neuron.bias,
+	        layer: list[i].layer
+	      };
+
+	      copy.squash = neuron.squash == Neuron.squash.LOGISTIC ? "LOGISTIC" :
+	        neuron.squash == Neuron.squash.TANH ? "TANH" :
+	        neuron.squash == Neuron.squash.IDENTITY ? "IDENTITY" :
+	        neuron.squash == Neuron.squash.HLIM ? "HLIM" :
+	        null;
+
+	      neurons.push(copy);
+	    }
+
+	    // get connections
+	    for (var i in list) {
+	      var neuron = list[i].neuron;
+	      while (neuron.neuron)
+	        neuron = neuron.neuron;
+
+	      for (var j in neuron.connections.projected) {
+	        var connection = neuron.connections.projected[j];
+	        connections.push({
+	          from: ids[connection.from.ID],
+	          to: ids[connection.to.ID],
+	          weight: connection.weight,
+	          gater: connection.gater ? ids[connection.gater.ID] : null,
+	        });
+	      }
+	      if (neuron.selfconnected())
+	        connections.push({
+	          from: ids[neuron.ID],
+	          to: ids[neuron.ID],
+	          weight: neuron.selfconnection.weight,
+	          gater: neuron.selfconnection.gater ? ids[neuron.selfconnection.gater.ID] : null,
+	        });
+	    }
+
+	    return {
+	      neurons: neurons,
+	      connections: connections
+	    }
+	  },
+
+	  // export the topology into dot language which can be visualized as graphs using dot
+	  /* example: ... console.log(net.toDotLang());
+	              $ node example.js > example.dot
+	              $ dot example.dot -Tpng > out.png
+	  */
+	  toDot: function(edgeConnection) {
+	    if (! typeof edgeConnection)
+	      edgeConnection = false;
+	    var code = "digraph nn {\n    rankdir = BT\n";
+	    var layers = [this.layers.input].concat(this.layers.hidden, this.layers.output);
+	    for (var layer in layers) {
+	      for (var to in layers[layer].connectedTo) { // projections
+	        var connection = layers[layer].connectedTo[to];
+	        var layerTo = connection.to;
+	        var size = connection.size;
+	        var layerID = layers.indexOf(layers[layer]);
+	        var layerToID = layers.indexOf(layerTo);
+	        /* http://stackoverflow.com/questions/26845540/connect-edges-with-graph-dot
+	         * DOT does not support edge-to-edge connections
+	         * This workaround produces somewhat weird graphs ...
+	        */
+	        if ( edgeConnection) {
+	          if (connection.gatedfrom.length) {
+	            var fakeNode = "fake" + layerID + "_" + layerToID;
+	            code += "    " + fakeNode +
+	              " [label = \"\", shape = point, width = 0.01, height = 0.01]\n";
+	            code += "    " + layerID + " -> " + fakeNode + " [label = " + size + ", arrowhead = none]\n";
+	            code += "    " + fakeNode + " -> " + layerToID + "\n";
+	          } else
+	            code += "    " + layerID + " -> " + layerToID + " [label = " + size + "]\n";
+	          for (var from in connection.gatedfrom) { // gatings
+	            var layerfrom = connection.gatedfrom[from].layer;
+	            var type = connection.gatedfrom[from].type;
+	            var layerfromID = layers.indexOf(layerfrom);
+	            code += "    " + layerfromID + " -> " + fakeNode + " [color = blue]\n";
+	          }
+	        } else {
+	          code += "    " + layerID + " -> " + layerToID + " [label = " + size + "]\n";
+	          for (var from in connection.gatedfrom) { // gatings
+	            var layerfrom = connection.gatedfrom[from].layer;
+	            var type = connection.gatedfrom[from].type;
+	            var layerfromID = layers.indexOf(layerfrom);
+	            code += "    " + layerfromID + " -> " + layerToID + " [color = blue]\n";
+	          }
+	        }
+	      }
+	    }
+	    code += "}\n";
+	    return {
+	      code: code,
+	      link: "https://chart.googleapis.com/chart?chl=" + escape(code.replace("/ /g", "+")) + "&cht=gv"
+	    }
+	  },
+
+	  // returns a function that works as the activation of the network and can be used without depending on the library
+	  standalone: function() {
+	    if (!this.optimized)
+	      this.optimize();
+
+	    var data = this.optimized.data;
+
+	    // build activation function
+	    var activation = "function (input) {\n";
+
+	    // build inputs
+	    for (var i in data.inputs)
+	      activation += "F[" + data.inputs[i] + "] = input[" + i + "];\n";
+
+	    // build network activation
+	    for (var neuron in data.activate) { // shouldn't this be layer?
+	      for (var sentence in data.activate[neuron])
+	        activation += data.activate[neuron][sentence].join('') + "\n";
+	    }
+
+	    // build outputs
+	    activation += "var output = [];\n";
+	    for (var i in data.outputs)
+	      activation += "output[" + i + "] = F[" + data.outputs[i] + "];\n";
+	    activation += "return output;\n}";
+
+	    // reference all the positions in memory
+	    var memory = activation.match(/F\[(\d+)\]/g);
+	    var dimension = 0;
+	    var ids = {};
+	    for (var address in memory) {
+	      var tmp = memory[address].match(/\d+/)[0];
+	      if (!(tmp in ids)) {
+	        ids[tmp] = dimension++;
+	      }
+	    }
+	    var hardcode = "F = {\n";
+	    for (var i in ids)
+	      hardcode += ids[i] + ": " + this.optimized.memory[i] + ",\n";
+	    hardcode = hardcode.substring(0, hardcode.length - 2) + "\n};\n";
+	    hardcode = "var run = " + activation.replace(/F\[(\d+)]/g, function(
+	      index) {
+	      return 'F[' + ids[index.match(/\d+/)[0]] + ']'
+	    }).replace("{\n", "{\n" + hardcode + "") + ";\n";
+	    hardcode += "return run";
+
+	    // return standalone function
+	    return new Function(hardcode)();
+	  },
+
+	  worker: function() {
+	    if (!this.optimized)
+	      this.optimize();
+
+	    var hardcode = "var inputs = " + this.optimized.data.inputs.length +
+	      ";\n";
+	    hardcode += "var outputs = " + this.optimized.data.outputs.length +
+	      ";\n";
+	    hardcode += "var F = null;\n";
+	    hardcode += "var activate = " + this.optimized.activate.toString() +
+	      ";\n";
+	    hardcode += "var propagate = " + this.optimized.propagate.toString() +
+	      ";\n";
+	    hardcode += "onmessage = function(e){\n";
+	    hardcode += "F = e.data.memoryBuffer;\n";
+	    hardcode += "if (e.data.action == 'activate'){\n";
+	    hardcode += "if (e.data.input.length == inputs){\n";
+	    hardcode +=
+	      "postMessage( { action: 'activate', output: activate(e.data.input), memoryBuffer: F }, [F.buffer]);\n";
+	    hardcode += "}\n}\nelse if (e.data.action == 'propagate'){\n";
+	    hardcode += "propagate(e.data.rate, e.data.target);\n";
+	    hardcode +=
+	      "postMessage({ action: 'propagate', memoryBuffer: F }, [F.buffer]);\n";
+	    hardcode += "}\n}\n";
+
+	    var blob = new Blob([hardcode]);
+	    var blobURL = window.URL.createObjectURL(blob);
+
+	    return new Worker(blobURL);
+	  },
+
+	  // returns a copy of the network
+	  clone: function() {
+	    return Network.fromJSON(this.toJSON());
+	  }
+	}
+
+	// rebuild a network that has been stored in a json using the method toJSON()
+	Network.fromJSON = function(json) {
+
+	  var neurons = [];
+
+	  var layers = {
+	    input: new Layer(),
+	    hidden: [],
+	    output: new Layer()
+	  }
+
+	  for (var i in json.neurons) {
+	    var config = json.neurons[i];
+
+	    var neuron = new Neuron();
+	    neuron.trace.elegibility = {};
+	    neuron.trace.extended = {};
+	    neuron.state = config.state;
+	    neuron.old = config.old;
+	    neuron.activation = config.activation;
+	    neuron.bias = config.bias;
+	    neuron.squash = config.squash in Neuron.squash ? Neuron.squash[config.squash] : Neuron.squash.LOGISTIC;
+	    neurons.push(neuron);
+
+	    if (config.layer == 'input')
+	      layers.input.add(neuron);
+	    else if (config.layer == 'output')
+	      layers.output.add(neuron);
+	    else {
+	      if (typeof layers.hidden[config.layer] == 'undefined')
+	        layers.hidden[config.layer] = new Layer();
+	      layers.hidden[config.layer].add(neuron);
+	    }
+	  }
+
+	  for (var i in json.connections) {
+	    var config = json.connections[i];
+	    var from = neurons[config.from];
+	    var to = neurons[config.to];
+	    var weight = config.weight
+	    var gater = neurons[config.gater];
+
+	    var connection = from.project(to, weight);
+	    if (gater)
+	      gater.gate(connection);
+	  }
+
+	  return new Network(layers);
+	}
+
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)(module)))
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(module) {// export
+	if (module) module.exports = Trainer;
+
+	/*******************************************************************************************
+	                                        TRAINER
+	*******************************************************************************************/
+
+	function Trainer(network, options) {
+	  options = options || {};
+	  this.network = network;
+	  this.rate = options.rate || .2;
+	  this.iterations = options.iterations || 100000;
+	  this.error = options.error || .005
+	  this.cost = options.cost || null;
+	  this.crossValidate = options.crossValidate || null;
+	}
+
+	Trainer.prototype = {
+
+	  // trains any given set to a network
+	  train: function(set, options) {
+
+	    var error = 1;
+	    var iterations = bucketSize = 0;
+	    var abort = false;
+	    var input, output, target, currentRate;
+	    var cost = options && options.cost || this.cost || Trainer.cost.MSE;
+	    var crossValidate = false, testSet, trainSet;
+
+	    var start = Date.now();
+
+	    if (options) {
+	      if (options.shuffle) {
+	        //+ Jonas Raoni Soares Silva
+	        //@ http://jsfromhell.com/array/shuffle [v1.0]
+	        function shuffle(o) { //v1.0
+	          for (var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+	          return o;
+	        };
+	      }
+	      if (options.iterations)
+	        this.iterations = options.iterations;
+	      if (options.error)
+	        this.error = options.error;
+	      if (options.rate)
+	        this.rate = options.rate;
+	      if (options.cost)
+	        this.cost = options.cost;
+	      if (options.schedule)
+	        this.schedule = options.schedule;
+	      if (options.customLog){
+	        // for backward compatibility with code that used customLog
+	        console.log('Deprecated: use schedule instead of customLog')
+	        this.schedule = options.customLog;
+	      }
+	      if (this.crossValidate) {
+	        crossValidate = true;
+	        if (options.crossValidate.testSize)
+	          this.crossValidate.testSize = options.crossValidate.testSize;
+	        if (options.crossValidate.testError)
+	          this.crossValidate.testError = options.crossValidate.testError;
+	      }
+	    }
+
+	    currentRate = this.rate;
+	    if(Array.isArray(this.rate)) {
+	      bucketSize = Math.floor(this.iterations / this.rate.length);
+	    }
+
+	    if(crossValidate) {
+	      var numTrain = Math.ceil((1 - this.crossValidate.testSize) * set.length);
+	      trainSet = set.slice(0, numTrain);
+	      testSet = set.slice(numTrain);
+	    }
+
+	    while ((!abort && iterations < this.iterations && error > this.error)) {
+	      if (crossValidate && error <= this.crossValidate.testError) {
+	        break;
+	      }
+
+	      var currentSetSize = set.length;
+	      error = 0;
+
+	      if(bucketSize > 0) {
+	        var currentBucket = Math.floor(iterations / bucketSize);
+	        currentRate = this.rate[currentBucket] || currentRate;
+	      }
+
+	      if (crossValidate) {
+	        this._trainSet(trainSet, currentRate, cost);
+	        error += this.test(testSet).error;
+	        currentSetSize = 1;
+	      } else {
+	        error += this._trainSet(set, currentRate, cost);
+	        currentSetSize = set.length;
+	      }
+
+	      // check error
+	      iterations++;
+	      error /= currentSetSize;
+
+	      if (options) {
+	        if (this.schedule && this.schedule.every && iterations %
+	          this.schedule.every == 0)
+	          abort = this.schedule.do({
+	            error: error,
+	            iterations: iterations,
+	            rate: currentRate
+	          });
+	        else if (options.log && iterations % options.log == 0) {
+	          console.log('iterations', iterations, 'error', error, 'rate', currentRate);
+	        };
+	        if (options.shuffle)
+	          shuffle(set);
+	      }
+	    }
+
+	    var results = {
+	      error: error,
+	      iterations: iterations,
+	      time: Date.now() - start
+	    }
+
+	    return results;
+	  },
+
+	  // preforms one training epoch and returns the error (private function used in this.train)
+	  _trainSet: function(set, currentRate, costFunction) {
+	    var errorSum = 0;
+	    for (var train in set) {
+	      input = set[train].input;
+	      target = set[train].output;
+
+	      output = this.network.activate(input);
+	      this.network.propagate(currentRate, target);
+
+	      errorSum += costFunction(target, output);
+	    }
+	    return errorSum;
+	  },
+
+	  // tests a set and returns the error and elapsed time
+	  test: function(set, options) {
+
+	    var error = 0;
+	    var abort = false;
+	    var input, output, target;
+	    var cost = options && options.cost || this.cost || Trainer.cost.MSE;
+
+	    var start = Date.now();
+
+	    for (var test in set) {
+	      input = set[test].input;
+	      target = set[test].output;
+	      output = this.network.activate(input);
+	      error += cost(target, output);
+	    }
+
+	    error /= set.length;
+
+	    var results = {
+	      error: error,
+	      time: Date.now() - start
+	    }
+
+	    return results;
+	  },
+
+	  // trains any given set to a network using a WebWorker
+	  workerTrain: function(set, callback, options) {
+
+	    var that = this;
+	    var error = 1;
+	    var iterations = bucketSize = 0;
+	    var input, output, target, currentRate;
+	    var length = set.length;
+	    var abort = false;
+	    var cost = options && options.cost || that.cost || Trainer.cost.MSE;
+
+	    var start = Date.now();
+
+	    if (options) {
+	      if (options.shuffle) {
+	        //+ Jonas Raoni Soares Silva
+	        //@ http://jsfromhell.com/array/shuffle [v1.0]
+	        function shuffle(o) { //v1.0
+	          for (var j, x, i = o.length; i; j = Math.floor(Math.random() *
+	              i), x = o[--i], o[i] = o[j], o[j] = x);
+	          return o;
+	        };
+	      }
+	      if (options.iterations)
+	        that.iterations = options.iterations;
+	      if (options.error)
+	        that.error = options.error;
+	      if (options.rate)
+	        that.rate = options.rate;
+	      if (options.cost)
+	        that.cost = options.cost;
+	      if (options.schedule)
+	        that.schedule = options.schedule;
+	      if (options.customLog)
+	      {
+	        // for backward compatibility with code that used customLog
+	        console.log('Deprecated: use schedule instead of customLog')
+	        that.schedule = options.customLog;
+	      }
+	    }
+
+	    // dynamic learning rate
+	    currentRate = that.rate;
+	    if(Array.isArray(that.rate)) {
+	      bucketSize = Math.floor(that.iterations / that.rate.length);
+	    }
+
+	    // create a worker
+	    var worker = that.network.worker();
+
+	    // activate the network
+	    function activateWorker(input)
+	    {
+	        worker.postMessage({
+	            action: "activate",
+	            input: input,
+	            memoryBuffer: that.network.optimized.memory
+	        }, [that.network.optimized.memory.buffer]);
+	    }
+
+	    // backpropagate the network
+	    function propagateWorker(target){
+	        if(bucketSize > 0) {
+	          var currentBucket = Math.floor(iterations / bucketSize);
+	          currentRate = that.rate[currentBucket] || currentRate;
+	        }
+	        worker.postMessage({
+	            action: "propagate",
+	            target: target,
+	            rate: currentRate,
+	            memoryBuffer: that.network.optimized.memory
+	        }, [that.network.optimized.memory.buffer]);
+	    }
+
+	    // train the worker
+	    worker.onmessage = function(e){
+	        // give control of the memory back to the network
+	        that.network.optimized.ownership(e.data.memoryBuffer);
+
+	        if (e.data.action == "propagate")
+	        {
+	            if (index >= length)
+	            {
+	                index = 0;
+	                iterations++;
+	                error /= set.length;
+
+	                // log
+	                if (options) {
+	                  if (that.schedule && that.schedule.every && iterations % that.schedule.every == 0)
+	                    abort = that.schedule.do({
+	                      error: error,
+	                      iterations: iterations,
+	                      rate: currentRate
+	                    });
+	                  else if (options.log && iterations % options.log == 0) {
+	                    console.log('iterations', iterations, 'error', error);
+	                  };
+	                  if (options.shuffle)
+	                    shuffle(set);
+	                }
+
+	                if (!abort && iterations < that.iterations && error > that.error)
+	                {
+	                    activateWorker(set[index].input);
+	                } else {
+	                    // callback
+	                    callback({
+	                      error: error,
+	                      iterations: iterations,
+	                      time: Date.now() - start
+	                    })
+	                }
+	                error = 0;
+	            } else {
+	                activateWorker(set[index].input);
+	            }
+	        }
+
+	        if (e.data.action == "activate")
+	        {
+	            error += cost(set[index].output, e.data.output);
+	            propagateWorker(set[index].output);
+	            index++;
+	        }
+	    }
+
+	    // kick it
+	    var index = 0;
+	    var iterations = 0;
+	    activateWorker(set[index].input);
+	  },
+
+	  // trains an XOR to the network
+	  XOR: function(options) {
+
+	    if (this.network.inputs() != 2 || this.network.outputs() != 1)
+	      throw new Error("Incompatible network (2 inputs, 1 output)");
+
+	    var defaults = {
+	      iterations: 100000,
+	      log: false,
+	      shuffle: true,
+	      cost: Trainer.cost.MSE
+	    }
+
+	    if (options)
+	      for (var i in options)
+	        defaults[i] = options[i];
+
+	    return this.train([{
+	      input: [0, 0],
+	      output: [0]
+	    }, {
+	      input: [1, 0],
+	      output: [1]
+	    }, {
+	      input: [0, 1],
+	      output: [1]
+	    }, {
+	      input: [1, 1],
+	      output: [0]
+	    }], defaults);
+	  },
+
+	  // trains the network to pass a Distracted Sequence Recall test
+	  DSR: function(options) {
+	    options = options || {};
+
+	    var targets = options.targets || [2, 4, 7, 8];
+	    var distractors = options.distractors || [3, 5, 6, 9];
+	    var prompts = options.prompts || [0, 1];
+	    var length = options.length || 24;
+	    var criterion = options.success || 0.95;
+	    var iterations = options.iterations || 100000;
+	    var rate = options.rate || .1;
+	    var log = options.log || 0;
+	    var schedule = options.schedule || {};
+	    var cost = options.cost || this.cost || Trainer.cost.CROSS_ENTROPY;
+
+	    var trial = correct = i = j = success = 0,
+	      error = 1,
+	      symbols = targets.length + distractors.length + prompts.length;
+
+	    var noRepeat = function(range, avoid) {
+	      var number = Math.random() * range | 0;
+	      var used = false;
+	      for (var i in avoid)
+	        if (number == avoid[i])
+	          used = true;
+	      return used ? noRepeat(range, avoid) : number;
+	    }
+
+	    var equal = function(prediction, output) {
+	      for (var i in prediction)
+	        if (Math.round(prediction[i]) != output[i])
+	          return false;
+	      return true;
+	    }
+
+	    var start = Date.now();
+
+	    while (trial < iterations && (success < criterion || trial % 1000 != 0)) {
+	      // generate sequence
+	      var sequence = [],
+	        sequenceLength = length - prompts.length;
+	      for (i = 0; i < sequenceLength; i++) {
+	        var any = Math.random() * distractors.length | 0;
+	        sequence.push(distractors[any]);
+	      }
+	      var indexes = [],
+	        positions = [];
+	      for (i = 0; i < prompts.length; i++) {
+	        indexes.push(Math.random() * targets.length | 0);
+	        positions.push(noRepeat(sequenceLength, positions));
+	      }
+	      positions = positions.sort();
+	      for (i = 0; i < prompts.length; i++) {
+	        sequence[positions[i]] = targets[indexes[i]];
+	        sequence.push(prompts[i]);
+	      }
+
+	      //train sequence
+	      var targetsCorrect = distractorsCorrect = 0;
+	      error = 0;
+	      for (i = 0; i < length; i++) {
+	        // generate input from sequence
+	        var input = [];
+	        for (j = 0; j < symbols; j++)
+	          input[j] = 0;
+	        input[sequence[i]] = 1;
+
+	        // generate target output
+	        var output = [];
+	        for (j = 0; j < targets.length; j++)
+	          output[j] = 0;
+
+	        if (i >= sequenceLength) {
+	          var index = i - sequenceLength;
+	          output[indexes[index]] = 1;
+	        }
+
+	        // check result
+	        var prediction = this.network.activate(input);
+
+	        if (equal(prediction, output))
+	          if (i < sequenceLength)
+	            distractorsCorrect++;
+	          else
+	            targetsCorrect++;
+	        else {
+	          this.network.propagate(rate, output);
+	        }
+
+	        error += cost(output, prediction);
+
+	        if (distractorsCorrect + targetsCorrect == length)
+	          correct++;
+	      }
+
+	      // calculate error
+	      if (trial % 1000 == 0)
+	        correct = 0;
+	      trial++;
+	      var divideError = trial % 1000;
+	      divideError = divideError == 0 ? 1000 : divideError;
+	      success = correct / divideError;
+	      error /= length;
+
+	      // log
+	      if (log && trial % log == 0)
+	        console.log("iterations:", trial, " success:", success, " correct:",
+	          correct, " time:", Date.now() - start, " error:", error);
+	      if (schedule.do && schedule.every && trial % schedule.every == 0)
+	        schedule.do({
+	          iterations: trial,
+	          success: success,
+	          error: error,
+	          time: Date.now() - start,
+	          correct: correct
+	        });
+	    }
+
+	    return {
+	      iterations: trial,
+	      success: success,
+	      error: error,
+	      time: Date.now() - start
+	    }
+	  },
+
+	  // train the network to learn an Embeded Reber Grammar
+	  ERG: function(options) {
+
+	    options = options || {};
+	    var iterations = options.iterations || 150000;
+	    var criterion = options.error || .05;
+	    var rate = options.rate || .1;
+	    var log = options.log || 500;
+	    var cost = options.cost || this.cost || Trainer.cost.CROSS_ENTROPY;
+
+	    // gramar node
+	    var Node = function() {
+	      this.paths = [];
+	    }
+	    Node.prototype = {
+	      connect: function(node, value) {
+	        this.paths.push({
+	          node: node,
+	          value: value
+	        });
+	        return this;
+	      },
+	      any: function() {
+	        if (this.paths.length == 0)
+	          return false;
+	        var index = Math.random() * this.paths.length | 0;
+	        return this.paths[index];
+	      },
+	      test: function(value) {
+	        for (var i in this.paths)
+	          if (this.paths[i].value == value)
+	            return this.paths[i];
+	        return false;
+	      }
+	    }
+
+	    var reberGrammar = function() {
+
+	      // build a reber grammar
+	      var output = new Node();
+	      var n1 = (new Node()).connect(output, "E");
+	      var n2 = (new Node()).connect(n1, "S");
+	      var n3 = (new Node()).connect(n1, "V").connect(n2, "P");
+	      var n4 = (new Node()).connect(n2, "X")
+	      n4.connect(n4, "S");
+	      var n5 = (new Node()).connect(n3, "V")
+	      n5.connect(n5, "T");
+	      n2.connect(n5, "X")
+	      var n6 = (new Node()).connect(n4, "T").connect(n5, "P");
+	      var input = (new Node()).connect(n6, "B")
+
+	      return {
+	        input: input,
+	        output: output
+	      }
+	    }
+
+	    // build an embeded reber grammar
+	    var embededReberGrammar = function() {
+	      var reber1 = reberGrammar();
+	      var reber2 = reberGrammar();
+
+	      var output = new Node();
+	      var n1 = (new Node).connect(output, "E");
+	      reber1.output.connect(n1, "T");
+	      reber2.output.connect(n1, "P");
+	      var n2 = (new Node).connect(reber1.input, "P").connect(reber2.input,
+	        "T");
+	      var input = (new Node).connect(n2, "B");
+
+	      return {
+	        input: input,
+	        output: output
+	      }
+
+	    }
+
+	    // generate an ERG sequence
+	    var generate = function() {
+	      var node = embededReberGrammar().input;
+	      var next = node.any();
+	      var str = "";
+	      while (next) {
+	        str += next.value;
+	        next = next.node.any();
+	      }
+	      return str;
+	    }
+
+	    // test if a string matches an embeded reber grammar
+	    var test = function(str) {
+	      var node = embededReberGrammar().input;
+	      var i = 0;
+	      var ch = str.charAt(i);
+	      while (i < str.length) {
+	        var next = node.test(ch);
+	        if (!next)
+	          return false;
+	        node = next.node;
+	        ch = str.charAt(++i);
+	      }
+	      return true;
+	    }
+
+	    // helper to check if the output and the target vectors match
+	    var different = function(array1, array2) {
+	      var max1 = 0;
+	      var i1 = -1;
+	      var max2 = 0;
+	      var i2 = -1;
+	      for (var i in array1) {
+	        if (array1[i] > max1) {
+	          max1 = array1[i];
+	          i1 = i;
+	        }
+	        if (array2[i] > max2) {
+	          max2 = array2[i];
+	          i2 = i;
+	        }
+	      }
+
+	      return i1 != i2;
+	    }
+
+	    var iteration = 0;
+	    var error = 1;
+	    var table = {
+	      "B": 0,
+	      "P": 1,
+	      "T": 2,
+	      "X": 3,
+	      "S": 4,
+	      "E": 5
+	    }
+
+	    var start = Date.now();
+	    while (iteration < iterations && error > criterion) {
+	      var i = 0;
+	      error = 0;
+
+	      // ERG sequence to learn
+	      var sequence = generate();
+
+	      // input
+	      var read = sequence.charAt(i);
+	      // target
+	      var predict = sequence.charAt(i + 1);
+
+	      // train
+	      while (i < sequence.length - 1) {
+	        var input = [];
+	        var target = [];
+	        for (var j = 0; j < 6; j++) {
+	          input[j] = 0;
+	          target[j] = 0;
+	        }
+	        input[table[read]] = 1;
+	        target[table[predict]] = 1;
+
+	        var output = this.network.activate(input);
+
+	        if (different(output, target))
+	          this.network.propagate(rate, target);
+
+	        read = sequence.charAt(++i);
+	        predict = sequence.charAt(i + 1);
+
+	        error += cost(target, output);
+	      }
+	      error /= sequence.length;
+	      iteration++;
+	      if (iteration % log == 0) {
+	        console.log("iterations:", iteration, " time:", Date.now() - start,
+	          " error:", error);
+	      }
+	    }
+
+	    return {
+	      iterations: iteration,
+	      error: error,
+	      time: Date.now() - start,
+	      test: test,
+	      generate: generate
+	    }
+	  },
+
+	  timingTask: function(options){
+
+	    if (this.network.inputs() != 2 || this.network.outputs() != 1)
+	      throw new Error("Invalid Network: must have 2 inputs and one output");
+
+	    if (typeof options == 'undefined')
+	      var options = {};
+
+	    // helper
+	    function getSamples (trainingSize, testSize){
+
+	      // sample size
+	      var size = trainingSize + testSize;
+
+	      // generate samples
+	      var t = 0;
+	      var set  = [];
+	      for (var i = 0; i < size; i++) {
+	        set.push({ input: [0,0], output: [0] });
+	      }
+	      while(t < size - 20) {
+	          var n = Math.round(Math.random() * 20);
+	          set[t].input[0] = 1;
+	          for (var j = t; j <= t + n; j++){
+	              set[j].input[1] = n / 20;
+	              set[j].output[0] = 0.5;
+	          }
+	          t += n;
+	          n = Math.round(Math.random() * 20);
+	          for (var k = t+1; k <= (t + n) &&  k < size; k++)
+	              set[k].input[1] = set[t].input[1];
+	          t += n;
+	      }
+
+	      // separate samples between train and test sets
+	      var trainingSet = []; var testSet = [];
+	      for (var l = 0; l < size; l++)
+	          (l < trainingSize ? trainingSet : testSet).push(set[l]);
+
+	      // return samples
+	      return {
+	          train: trainingSet,
+	          test: testSet
+	      }
+	    }
+
+	    var iterations = options.iterations || 200;
+	    var error = options.error || .005;
+	    var rate = options.rate || [.03, .02];
+	    var log = options.log === false ? false : options.log || 10;
+	    var cost = options.cost || this.cost || Trainer.cost.MSE;
+	    var trainingSamples = options.trainSamples || 7000;
+	    var testSamples = options.trainSamples || 1000;
+
+	    // samples for training and testing
+	    var samples = getSamples(trainingSamples, testSamples);
+
+	    // train
+	    var result = this.train(samples.train, {
+	      rate: rate,
+	      log: log,
+	      iterations: iterations,
+	      error: error,
+	      cost: cost
+	    });
+
+	    return {
+	      train: result,
+	      test: this.test(samples.test)
+	    }
+	  }
+	};
+
+	// Built-in cost functions
+	Trainer.cost = {
+	  // Eq. 9
+	  CROSS_ENTROPY: function(target, output)
+	  {
+	    var crossentropy = 0;
+	    for (var i in output)
+	      crossentropy -= (target[i] * Math.log(output[i]+1e-15)) + ((1-target[i]) * Math.log((1+1e-15)-output[i])); // +1e-15 is a tiny push away to avoid Math.log(0)
+	    return crossentropy;
+	  },
+	  MSE: function(target, output)
+	  {
+	    var mse = 0;
+	    for (var i in output)
+	      mse += Math.pow(target[i] - output[i], 2);
+	    return mse / output.length;
+	  },
+	  BINARY: function(target, output){
+	    var misses = 0;
+	    for (var i in output)
+	      misses += Math.round(target[i] * 2) != Math.round(output[i] * 2);
+	    return misses;
+	  }
+	}
+
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)(module)))
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(module) {// import
+	var Layer   = __webpack_require__(6)
+	,   Network = __webpack_require__(7)
+	,   Trainer = __webpack_require__(8)
+
+	/*******************************************************************************************
+	                                        ARCHITECT
+	*******************************************************************************************/
+
+	// Colection of useful built-in architectures
+	var Architect = {
+
+	  // Multilayer Perceptron
+	  Perceptron: function Perceptron() {
+
+	    var args = Array.prototype.slice.call(arguments); // convert arguments to Array
+	    if (args.length < 3)
+	      throw new Error("not enough layers (minimum 3) !!");
+
+	    var inputs = args.shift(); // first argument
+	    var outputs = args.pop(); // last argument
+	    var layers = args; // all the arguments in the middle
+
+	    var input = new Layer(inputs);
+	    var hidden = [];
+	    var output = new Layer(outputs);
+
+	    var previous = input;
+
+	    // generate hidden layers
+	    for (level in layers) {
+	      var size = layers[level];
+	      var layer = new Layer(size);
+	      hidden.push(layer);
+	      previous.project(layer);
+	      previous = layer;
+	    }
+	    previous.project(output);
+
+	    // set layers of the neural network
+	    this.set({
+	      input: input,
+	      hidden: hidden,
+	      output: output
+	    });
+
+	    // trainer for the network
+	    this.trainer = new Trainer(this);
+	  },
+
+	  // Multilayer Long Short-Term Memory
+	  LSTM: function LSTM() {
+
+	    var args = Array.prototype.slice.call(arguments); // convert arguments to array
+	    if (args.length < 3)
+	      throw new Error("not enough layers (minimum 3) !!");
+
+	    var last = args.pop();
+	    var option = {
+	      peepholes: Layer.connectionType.ALL_TO_ALL,
+	      hiddenToHidden: false,
+	      outputToHidden: false,
+	      outputToGates: false,
+	      inputToOutput: true,
+	    };
+	    if (typeof last != 'number') {
+	      var outputs = args.pop();
+	      if (last.hasOwnProperty('peepholes'))
+	        option.peepholes = last.peepholes;
+	      if (last.hasOwnProperty('hiddenToHidden'))
+	        option.hiddenToHidden = last.hiddenToHidden;
+	      if (last.hasOwnProperty('outputToHidden'))
+	        option.outputToHidden = last.outputToHidden;
+	      if (last.hasOwnProperty('outputToGates'))
+	        option.outputToGates = last.outputToGates;
+	      if (last.hasOwnProperty('inputToOutput'))
+	        option.inputToOutput = last.inputToOutput;
+	    } else
+	      var outputs = last;
+
+	    var inputs = args.shift();
+	    var layers = args;
+
+	    var inputLayer = new Layer(inputs);
+	    var hiddenLayers = [];
+	    var outputLayer = new Layer(outputs);
+
+	    var previous = null;
+
+	    // generate layers
+	    for (var layer in layers) {
+	      // generate memory blocks (memory cell and respective gates)
+	      var size = layers[layer];
+
+	      var inputGate = new Layer(size).set({
+	        bias: 1
+	      });
+	      var forgetGate = new Layer(size).set({
+	        bias: 1
+	      });
+	      var memoryCell = new Layer(size);
+	      var outputGate = new Layer(size).set({
+	        bias: 1
+	      });
+
+	      hiddenLayers.push(inputGate);
+	      hiddenLayers.push(forgetGate);
+	      hiddenLayers.push(memoryCell);
+	      hiddenLayers.push(outputGate);
+
+	      // connections from input layer
+	      var input = inputLayer.project(memoryCell);
+	      inputLayer.project(inputGate);
+	      inputLayer.project(forgetGate);
+	      inputLayer.project(outputGate);
+
+	      // connections from previous memory-block layer to this one
+	      if (previous != null) {
+	        var cell = previous.project(memoryCell);
+	        previous.project(inputGate);
+	        previous.project(forgetGate);
+	        previous.project(outputGate);
+	      }
+
+	      // connections from memory cell
+	      var output = memoryCell.project(outputLayer);
+
+	      // self-connection
+	      var self = memoryCell.project(memoryCell);
+
+	      // hidden to hidden recurrent connection
+	      if (option.hiddenToHidden)
+	        memoryCell.project(memoryCell, Layer.connectionType.ALL_TO_ELSE);
+
+	      // out to hidden recurrent connection
+	      if (option.outputToHidden)
+	        outputLayer.project(memoryCell);
+
+	      // out to gates recurrent connection
+	      if (option.outputToGates) {
+	        outputLayer.project(inputGate);
+	        outputLayer.project(outputGate);
+	        outputLayer.project(forgetGate);
+	      }
+
+	      // peepholes
+	      memoryCell.project(inputGate, option.peepholes);
+	      memoryCell.project(forgetGate, option.peepholes);
+	      memoryCell.project(outputGate, option.peepholes);
+
+	      // gates
+	      inputGate.gate(input, Layer.gateType.INPUT);
+	      forgetGate.gate(self, Layer.gateType.ONE_TO_ONE);
+	      outputGate.gate(output, Layer.gateType.OUTPUT);
+	      if (previous != null)
+	        inputGate.gate(cell, Layer.gateType.INPUT);
+
+	      previous = memoryCell;
+	    }
+
+	    // input to output direct connection
+	    if (option.inputToOutput)
+	      inputLayer.project(outputLayer);
+
+	    // set the layers of the neural network
+	    this.set({
+	      input: inputLayer,
+	      hidden: hiddenLayers,
+	      output: outputLayer
+	    });
+
+	    // trainer
+	    this.trainer = new Trainer(this);
+	  },
+
+	  // Liquid State Machine
+	  Liquid: function Liquid(inputs, hidden, outputs, connections, gates) {
+
+	    // create layers
+	    var inputLayer = new Layer(inputs);
+	    var hiddenLayer = new Layer(hidden);
+	    var outputLayer = new Layer(outputs);
+
+	    // make connections and gates randomly among the neurons
+	    var neurons = hiddenLayer.neurons();
+	    var connectionList = [];
+
+	    for (var i = 0; i < connections; i++) {
+	      // connect two random neurons
+	      var from = Math.random() * neurons.length | 0;
+	      var to = Math.random() * neurons.length | 0;
+	      var connection = neurons[from].project(neurons[to]);
+	      connectionList.push(connection);
+	    }
+
+	    for (var j = 0; j < gates; j++) {
+	      // pick a random gater neuron
+	      var gater = Math.random() * neurons.length | 0;
+	      // pick a random connection to gate
+	      var connection = Math.random() * connectionList.length | 0;
+	      // let the gater gate the connection
+	      neurons[gater].gate(connectionList[connection]);
+	    }
+
+	    // connect the layers
+	    inputLayer.project(hiddenLayer);
+	    hiddenLayer.project(outputLayer);
+
+	    // set the layers of the network
+	    this.set({
+	      input: inputLayer,
+	      hidden: [hiddenLayer],
+	      output: outputLayer
+	    });
+
+	    // trainer
+	    this.trainer = new Trainer(this);
+	  },
+
+	  Hopfield: function Hopfield(size)
+	  {
+	    var inputLayer = new Layer(size);
+	    var outputLayer = new Layer(size);
+
+	    inputLayer.project(outputLayer, Layer.connectionType.ALL_TO_ALL);
+
+	    this.set({
+	      input: inputLayer,
+	      hidden: [],
+	      output: outputLayer
+	    });
+
+	    var trainer = new Trainer(this);
+
+	    var proto = Architect.Hopfield.prototype;
+
+	    proto.learn = proto.learn || function(patterns)
+	    {
+	      var set = [];
+	      for (var p in patterns)
+	        set.push({
+	          input: patterns[p],
+	          output: patterns[p]
+	        });
+
+	      return trainer.train(set, {
+	        iterations: 500000,
+	        error: .00005,
+	        rate: 1
+	      });
+	    }
+
+	    proto.feed = proto.feed || function(pattern)
+	    {
+	      var output = this.activate(pattern);
+
+	      var pattern = [];
+	      for (var i in output)
+	        pattern[i] = output[i] > .5 ? 1 : 0;
+
+	      return pattern;
+	    }
+	  }
+	}
+
+	// Extend prototype chain (so every architectures is an instance of Network)
+	for (var architecture in Architect) {
+	  Architect[architecture].prototype = new Network();
+	  Architect[architecture].prototype.constructor = Architect[architecture];
+	}
+
+	// export
+	if (module) module.exports = Architect;
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)(module)))
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.Creature = undefined;
+
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _vector = __webpack_require__(2);
+
+	var _vector2 = _interopRequireDefault(_vector);
+
+	var _synaptic = __webpack_require__(3);
+
+	var _synaptic2 = _interopRequireDefault(_synaptic);
+
+	var _food = __webpack_require__(11);
+
+	var _food2 = _interopRequireDefault(_food);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Creature = function () {
+	  function Creature(x, y) {
+	    _classCallCheck(this, Creature);
+
+	    this.p = new _vector2.default(x, y);
+	    this.v = new _vector2.default().random();
+	    this.network = new _synaptic2.default.Architect.Perceptron(2, 25, 2);
+	    this.energy = 0;
+	  }
+
+	  _createClass(Creature, [{
+	    key: 'tick',
+	    value: function tick(bounds, neighbors) {
+	      this.energy *= .995;
+	      var localFoodCOM = this.getCOM(neighbors).sub(this.p).normalize();
+	      //this.p.copy().add(this.getCOM(neighbors))
+
+	      var activation = this.activate(localFoodCOM);
+	      this.move(activation);
+	      this.p.wrap(bounds);
+	      this.eat(neighbors);
+	    }
+	  }, {
+	    key: 'eat',
+	    value: function eat(neighbors) {
+	      var _this = this;
+
+	      neighbors.length;
+	      var com = new _vector2.default();
+	      neighbors.forEach(function (n) {
+	        if (n instanceof _food2.default && _this.p.dist(n.p) < 10) {
+	          n.marked = true;
+	          _this.energy += 5;
+	        }
+	      });
+	    }
+	  }, {
+	    key: 'getCOM',
+	    value: function getCOM(entities) {
+	      if (entities.length === 0) {
+	        return new _vector2.default(0, 0);
+	      }
+	      var sum = entities.reduce(function (avg, e) {
+	        avg.add(e.p);
+	        return avg;
+	      }, new _vector2.default(0, 0));
+	      return sum.div(entities.length);
+	    }
+	  }, {
+	    key: 'activate',
+	    value: function activate(COM) {
+	      var input = [];
+	      input.push(COM.x);
+	      input.push(COM.y);
+	      // input.push(this.p.y);
+	      // input.push(this.p.x);
+
+	      var output = this.network.activate(input);
+
+	      var learningRate = .3;
+	      var target = [COM.x, COM.y];
+
+	      this.network.propagate(learningRate, target);
+	      return output;
+	    }
+	  }, {
+	    key: 'move',
+	    value: function move(_ref) {
+	      var _ref2 = _slicedToArray(_ref, 2);
+
+	      var ax = _ref2[0];
+	      var ay = _ref2[1];
+
+	      var aV = new _vector2.default(ax - .5, ay - .5).normalize();
+	      // move(a) {
+	      // let aV = a.normalize()
+	      aV.div(9);
+	      this.v.add(aV);
+	      this.v.normalize();
+	      this.p.add(this.v);
+	    }
+	  }, {
+	    key: 'angle',
+	    get: function get() {
+	      return this.v.angle();
+	    }
+	  }]);
+
+	  return Creature;
+	}();
+
+	exports.Creature = Creature;
+	exports.default = Creature;
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.food = undefined;
+
+	var _vector = __webpack_require__(2);
+
+	var _vector2 = _interopRequireDefault(_vector);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var food = function food(x, y) {
+	  _classCallCheck(this, food);
+
+	  this.p = new _vector2.default(x, y);
+	  this.marked = false;
+	};
+
+	exports.food = food;
+	exports.default = food;
+
+/***/ },
+/* 12 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var render = function render(ctx, creatures, foods, world) {
+	  var _ctx$canvas = ctx.canvas;
+	  var height = _ctx$canvas.height;
+	  var width = _ctx$canvas.width;
+
+	  var grd = ctx.createLinearGradient(0, 0, width, height);
+	  grd.addColorStop(0, '#baf');
+	  grd.addColorStop(.5, "#bbe");
+	  grd.addColorStop(1, '#abf');
+
+	  // Fill with gradient
+	  ctx.fillStyle = grd;
+	  // ctx.fillRect(0,0,width,height);
+
+	  for (var x = 0; x < world.maxTiles.x; x += 1) {
+	    for (var y = 0; y < world.maxTiles.y; y += 1) {
+	      var bin = world.tiles[x][y];
+	      if (bin !== undefined) {
+	        ctx.fillStyle = 'hsl(' + (180 + bin.length * 20) + ',30%,30%)';
+	      } else ctx.fillStyle = 'hsl(180,30%,30%)';
+
+	      ctx.fillRect(x * world.tileSize, y * world.tileSize, world.tileSize, world.tileSize);
+	    }
+	  }
+
+	  var sweep = Math.PI / 1.6;
+
+	  ctx.strokeStyle = "#daa";
+	  ctx.fillStyle = "#afa";
+	  foods.forEach(function (e) {
+	    ctx.beginPath();
+	    ctx.arc(e.p.x, e.p.y, 2 + 0.5 * Math.random(), 0, Math.PI * 2);
+	    ctx.stroke();
+	  });
+	  // ctx.fill();
+
+	  ctx.strokeStyle = "#fff";
+	  creatures.forEach(function (e) {
+	    ctx.beginPath();
+	    ctx.fillStyle = 'hsl(10,' + e.energy + '%,50%)';
+	    ctx.arc(e.p.x, e.p.y, 10 + 0.5 * Math.random(), e.angle - sweep, e.angle + sweep);
+	    ctx.stroke();
+	    ctx.fill();
+	  });
+	};
+
+	exports.render = render;
+
+/***/ }
+/******/ ]);
