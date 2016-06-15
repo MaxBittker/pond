@@ -40,8 +40,8 @@ const render = (ctx, creatures, foods, world, {max: maxEnergy, min: minEnergy}) 
   creatures.forEach(e=>{
     ctx.beginPath();
     let fitness = (e.energy - minEnergy)/ (maxEnergy-minEnergy)
-    ctx.fillStyle = `hsl(10,${fitness*fitness*100}%,50%)`;
-    ctx.arc(e.p.x,e.p.y, 10+ 0.5*Math.random(), e.angle - sweep, e.angle +sweep);
+    ctx.fillStyle = `hsl(${10},${fitness*fitness*100}%,50%)`;
+    ctx.arc(e.p.x,e.p.y, e.radius, e.angle - sweep, e.angle +sweep);
     ctx.stroke()
     ctx.fill();
   })

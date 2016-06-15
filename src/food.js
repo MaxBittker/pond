@@ -2,8 +2,8 @@ import V from './vector.js';
 
 
 class food {
-  constructor(x, y) {
-    this.p = new V(x,y)
+  constructor(p) {
+    this.p = p
     this.marked = false
   }
 }

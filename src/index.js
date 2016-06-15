@@ -3,31 +3,30 @@ import creature from './creature.js';
 import food from './food.js';
 
 import V from './vector.js';
-import { energyBounds, nBest } from './genetics.js';
+import { energyBounds, nBest, buildGeneration } from './genetics.js';
 import { render } from './render.js';
-let start = null;
+import {ui} from './ui.js';
 
+
+let start = null;
+let UI = new ui()
 
 
 const c = document.getElementById("canvas");
 const ctx = c.getContext("2d");
 const {width, height} = ctx.canvas
 
-
 let t = 1
 let creatures = []
 let foods = []
+let foodMap = new world(width, height, 50)
+let creatureMap = new world(width, height, 50)
 
-
-let W = new world(width, height, 25)
-
-const genFood = () =>  {
-  return (new food(Math.random()*width, Math.random()*height))
+const randomLoc = ()=>{
+  return new V(Math.random()*width, Math.random()*height)
 }
-
-for(var i=0; i<50 ;i+=1){
-  creatures.push(new creature(Math.random()*width,Math.random()*height))
-  foods.push(genFood())
+const genFood = () =>  {
+  return (new food(randomLoc()))
 }
 
 const everyNFrames = (n,callback)=>{
@@ -36,54 +35,54 @@ const everyNFrames = (n,callback)=>{
   }
 }
 
-const step = ()=> {
-
-    // foods.push(genFood())
-    // foods.push(genFood())
-    foods.push(genFood())
-    foods.push(genFood())
-    foods.push(genFood())
-
-    W.initializeMap()
-    // W.buildMap(creatures.concat(foods))
-    W.buildMap(foods)
-    const eBounds = energyBounds(creatures)
-    everyNFrames(400,()=>{
-      console.log(eBounds)
-      console.log(nBest(creatures,1)[0].getGenome())
-      creatures = nBest(creatures,15)
-      creatures.push(new creature(Math.random()*width,Math.random()*height))
-      creatures.push(new creature(Math.random()*width,Math.random()*height))
-      creatures.push(new creature(Math.random()*width,Math.random()*height))
-      creatures.push(new creature(Math.random()*width,Math.random()*height))
-      creatures.push(new creature(Math.random()*width,Math.random()*height))
-      creatures.push(new creature(Math.random()*width,Math.random()*height))
-      creatures.push(new creature(Math.random()*width,Math.random()*height))
-      creatures.push(new creature(Math.random()*width,Math.random()*height))
-
-      creatures = creatures.map(c=>{c.energy =0
-                                    return c})
-    })
-    render(ctx,creatures,foods,W,eBounds)
-    creatures.forEach(c=>{
-      let cBin = W.getNeighbors(c.p)
-      c.tick({x:width,y:height},cBin)
-    })
-
-    foods = foods.filter(f=>!f.marked)
-
+const updateMap = (emap, entityArray) => {
+  emap.initializeMap()
+  emap.buildMap(entityArray)
 }
 
 
+for(var i=0; i<10 ;i+=1){
+  creatures.push(new creature(randomLoc()))
+}
+const step = ()=> {
 
+    while(foods.length<500){
+      foods.push(genFood())
+    }
+    updateMap(foodMap,foods)
+    updateMap(creatureMap,creatures)
 
+    const eBounds = energyBounds(creatures)
+    let gTime = 5000
+    everyNFrames(gTime,()=>{
+      console.log("generation: " + ((t/gTime) |0)+ " f: " +(eBounds.max- eBounds.min))
+      creatures = nBest(creatures,10)
+      creatures = creatures.concat(buildGeneration(creatures,randomLoc,0.2),
+                                   buildGeneration(creatures,randomLoc,0.5))
+      creatures = creatures.map(c=>{c.energy = 0
+                                    return c})
+    })
+    everyNFrames(UI.speed,()=>{
+      render(ctx,creatures,foods,foodMap, eBounds)
+    })
+
+    creatures.forEach(c=>{
+      let fBin = foodMap.getNeighbors(c.p)
+      let cBin = creatureMap.getNeighbors(c.p)
+      c.tick({x:width,y:height},{fBin, cBin})
+    })
+
+    foods = foods.filter(f=>!f.marked)
+}
 
 
 const frame = (timestamp) => {
   if (!start) start = timestamp;
   var progress = timestamp - start;
-  step()
-  t++;
+  for(var s =0; s<UI.speed;s++){
+    step()
+    t++;
+  }
   window.requestAnimationFrame(frame);
 }
 
