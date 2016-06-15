@@ -7,7 +7,7 @@ class Creature {
   constructor(x, y) {
     this.p = new V(x,y)
     this.v = (new V()).random()
-    this.network = new synaptic.Architect.Perceptron(6, 25, 25, 2);
+    this.network = new synaptic.Architect.Perceptron(6, 16, 2);
     this.energy = 0;
   }
 
@@ -77,6 +77,39 @@ class Creature {
     this.v.normalize()
     this.p.add(this.v)
   }
+  getGenome () {
+        var genome = [];
+        this.network.neurons().forEach(function(o){
+            for(var type in o.neuron.connections){
+                if(type!=='projected') continue;
+                var connection = o.neuron.connections[type];
+                for(var id in connection){
+                    var weight = connection[id].weight;
+                    genome.push(weight);
+                }
+            }
+            if(o.layer !== 'input') genome.push(o.neuron.selfconnection.weight);
+        });
+
+        genome.push(this.color);
+        return genome;
+    }
+
+    setGenome (genome) {
+        var genome = genome.slice(0); //clone, TODO: find better solution, not efficient
+        this.brain.neurons().forEach(function(o){
+            for(var type in o.neuron.connections){
+                if(type!=='projected') continue;
+                var connection = o.neuron.connections[type];
+                for(var id in connection){
+                    var c = connection[id];
+                    var weight = genome.shift();
+                    c.weight = weight;
+                }
+            }
+            if(o.layer !== 'input') o.neuron.selfconnection.weight = genome.shift();
+        });
+    }
 
 }
 

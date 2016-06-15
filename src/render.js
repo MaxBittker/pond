@@ -1,5 +1,5 @@
 
-const render = (ctx, creatures, foods, world) => {
+const render = (ctx, creatures, foods, world, {max: maxEnergy, min: minEnergy}) => {
   const {height, width} = ctx.canvas
   const  grd = ctx.createLinearGradient(0,0,width,height);
   grd.addColorStop(0,'#baf');
@@ -39,7 +39,8 @@ const render = (ctx, creatures, foods, world) => {
   ctx.strokeStyle = "#0a0"
   creatures.forEach(e=>{
     ctx.beginPath();
-    ctx.fillStyle = `hsl(10,${e.energy}%,50%)`;
+    let fitness = (e.energy - minEnergy)/ (maxEnergy-minEnergy)
+    ctx.fillStyle = `hsl(10,${fitness*fitness*100}%,50%)`;
     ctx.arc(e.p.x,e.p.y, 10+ 0.5*Math.random(), e.angle - sweep, e.angle +sweep);
     ctx.stroke()
     ctx.fill();
