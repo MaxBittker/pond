@@ -7,22 +7,23 @@ class Creature {
   constructor(p) {
     this.p = p
     this.v = (new V()).random()
-    this.network = new synaptic.Architect.Perceptron(10, 24,24, 2);
+    this.network = new synaptic.Architect.Perceptron(11, 24,24, 2);
     this.energy = 0;
-    this.radius = 7
+    this.radius = 6
+    this.hue = 0;
+    this.setColor()
   }
 
   get angle() {
     return this.v.angle();
   }
 
-  tick(bounds,{fBin,cBin}){
-    // this.energy*=.995
+  tick(bounds,{fBin,cBin},speed){
     let processedInputs = this.getInputs({fBin,cBin})
     //this.p.copy().add(this.getInputs(neighbors))
     // debugger;
     let activation = this.activate(processedInputs)
-    this.move(activation)
+    this.move(activation,speed)
     this.p.wrap(bounds)
     this.eat(fBin)
   }
@@ -44,25 +45,31 @@ class Creature {
   }
 
   getCreatureInputs(creatures){
-    if(creatures.length===0){
+    if(creatures.length<2){
       return {c1p:new V(0,0),
-              c1v:new V(0,0)}
+              c1v:new V(0,0),
+              c1d: 1.0}
     }
-    let closestCreature = creatures.reduce((clostest,e)=>{
+    let noSelf = creatures.filter(e=>e!==this)
+    let closestCreature = noSelf.reduce((clostest,e)=>{
       if(this.p.dist(e.p)<this.p.dist(clostest.p)){
         return e
       }
       return clostest
     })
     return {c1p: closestCreature.p.copy().sub(this.p).normalize(),
-            c1v:   closestCreature.v.copy().normalize()
+            c1v: closestCreature.v.copy().normalize(),
+            c1d: closestCreature.p.mag()/100
           }
   }
-
+  // getClosestWall(){
+    // if(this.p.x)/
+  // }
   getFoodInputs(entities){
     if(entities.length===0){
       return {COM:new V(0,0),
-              f1:new V(0,0)}
+              f1:new V(0,0),
+              f1d: 1.0}
     }
     let closestfood = entities[0].p.copy()
     let sum = entities.reduce((avg,e)=>{
@@ -73,7 +80,8 @@ class Creature {
       return avg
     },(new V(0,0)))
     return {COM:  sum.div(entities.length).sub(this.p).normalize(),
-            f1:   closestfood.sub(this.p).normalize()
+            f1:   closestfood.copy().sub(this.p).normalize(),
+            f1d:  closestfood.copy().mag()/ (100)
           }
   }
   activate(processedInputs) {
@@ -82,16 +90,19 @@ class Creature {
     input.push(processedInputs.COM.y);
     input.push(processedInputs.f1.x);
     input.push(processedInputs.f1.y);
+    input.push(processedInputs.f1d); //5
+
 
     input.push(processedInputs.c1p.x);
     input.push(processedInputs.c1p.y);
     input.push(processedInputs.c1v.x);
     input.push(processedInputs.c1v.y);
+    input.push(processedInputs.c1d); //10
+
 
     input = input.map(i=>(i + 1) / 2)
+    input.push(Math.random());
 
-    input.push(Math.random());
-    input.push(Math.random());
 
 
     var output = this.network.activate(input);
@@ -102,12 +113,12 @@ class Creature {
     return (new V(output[0]-0.5,output[1]-0.5).normalize())
   }
 
-  move(a) {
+  move(a,d) {
     let aV = a.normalize()
-    aV.div(1)
+    aV.div(2)
     this.v.add(aV)
     this.v.normalize()
-    this.p.add(this.v.copy().mul(2))
+    this.p.add(this.v.copy().mul(d))
   }
   getGenome () {
         var genome = [];
@@ -142,7 +153,10 @@ class Creature {
         this.setColor()
     }
     setColor(){
-      // this.getGenome().
+      let c = this.getGenome()
+                .reduce((sum,w,i)=>sum + (Math.pow(1.01,i)*w),
+                        0)
+      this.hue = (c / 500)|0
     }
 
 }

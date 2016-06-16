@@ -25,12 +25,23 @@ const nBest = (entities,n) => {
 
 
 const buildGeneration = (entities, randLoc, factor) => {
-  let newborns =entities.map(e=>{
+  let crossovers = generateCrossovers(entities)
+
+  let newborns =crossovers.map(genome=>{
     let newborn = new creature(randLoc())
-    newborn.setGenome(mutateGenome(e.getGenome(),factor))
+    newborn.setGenome(genome)
     return newborn
   })
   return newborns
+}
+
+const generateCrossovers = (entities)=>{
+  let crossovers = entities.map(e=>{
+    return crossGenomes(e.getGenome(),
+                        entities[0].getGenome(),
+                        Math.random()*0.5)
+  })
+  return crossovers
 }
 
 const mutateGenome = (genome, factor) => {
@@ -44,7 +55,25 @@ const mutateGenome = (genome, factor) => {
     return mutated
 }
 
+const crossGenomes = (g1, g2, factor) => {
+  let glength = g1.length
+  let crossPoint = Math.random()*glength|0
+  let newGenomes = [new Array(glength),new Array(glength)]
+
+  for(var i =0; i<glength;i++){
+      let l = 0;
+      let r = 1;
+      if(i<crossPoint){
+        let l = 1;
+        let r = 0;
+      }
+      newGenomes[l][i]= g1[i]
+      newGenomes[r][i]= g1[i]
+  }
+  return mutateGenome(newGenomes[0],factor)
+}
 
 
 
-export {energyBounds, nBest, buildGeneration}
+
+export {energyBounds, nBest, buildGeneration, generateCrossovers}
