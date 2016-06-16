@@ -20,12 +20,12 @@ let t = 1
 let population = 50
 let creatures = []
 let foods = []
-let foodMap = new world(width, height, 50)
-let creatureMap = new world(width, height, 50)
+let foodMap = new world(width, height, 25)
+let creatureMap = new world(width, height, 25)
 
 const randomLoc = ()=>{
-  return new V((0.0 + (1.0*Math.random()))*width,
-               (0.0 + (1.0*Math.random()))*height)
+  return new V((0.025 + (0.95*Math.random()))*width,
+               (0.025 + (0.95*Math.random()))*height)
 }
 const genFood = () =>  {
   return (new food(randomLoc()))
@@ -43,34 +43,39 @@ const updateMap = (emap, entityArray) => {
 }
 
 
-for(var i=0; i<population ;i+=1){
+for(var i=0; i<100 ;i+=1){
   creatures.push(new creature(randomLoc()))
 }
+let gTime = 3000
+
+const newGeneration = (eBounds)=>{
+  let g = (t/gTime) |0
+  UI.setGeneration(g)
+  console.log("generation: " + g+ " f: " +(eBounds.max/ (eBounds.min+0.1)))
+  creatures = nBest(creatures,(population/3)|0)
+  creatures = creatures.concat(
+                                // buildGeneration(creatures,randomLoc,0.1),
+                                // buildGeneration(creatures,randomLoc,0.2),
+                                buildGeneration(creatures,randomLoc,0.3))
+  creatures = creatures.map(c=>{c.energy = 0
+                                return c})
+}
+
 const step = ()=> {
 
-    while(foods.length<100){
+    while(foods.length<500){
       foods.push(genFood())
     }
+    foods[Math.random()*foods.length|0].marked = Math.random()>0.5
     updateMap(foodMap,foods)
     updateMap(creatureMap,creatures)
 
     const eBounds = energyBounds(creatures)
-    let gTime = 1000000
-    everyNFrames(gTime,()=>{
-      let g = (t/gTime) |0
-      UI.setGeneration(g)
-      console.log("generation: " + g+ " f: " +(eBounds.max/ (eBounds.min+0.1)))
-      creatures = nBest(creatures,(population/2)|0)
-      creatures = creatures.concat(
-                                    // buildGeneration(creatures,randomLoc,0.1),
-                                    // buildGeneration(creatures,randomLoc,0.2),
-                                    buildGeneration(creatures,randomLoc,0.3))
-      creatures = creatures.map(c=>{c.energy = 0
-                                    return c})
-    })
-    everyNFrames(UI.speed,()=>{
-      render(ctx,creatures,foods,foodMap, eBounds)
-    })
+
+    everyNFrames(gTime,()=>newGeneration(eBounds))
+    if(UI.shouldNG()){
+      newGeneration(eBounds)
+    }
 
     creatures.forEach(c=>{
       let fBin = foodMap.getNeighbors(c.p)
@@ -79,6 +84,10 @@ const step = ()=> {
     })
 
     foods = foods.filter(f=>!f.marked)
+
+    everyNFrames(UI.speed,()=>{
+      render(ctx,creatures,foods,foodMap, eBounds)
+    })
 }
 
 

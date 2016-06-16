@@ -32,14 +32,44 @@ const buildGeneration = (entities, randLoc, factor) => {
     newborn.setGenome(genome)
     return newborn
   })
-  return newborns
+
+  // let asNewborns =entities.map(parent=>{
+  //   let newborn = new creature(randLoc())
+  //   newborn.setGenome(mutateGenome(parent.getGenome(),0.4))
+  //   return newborn
+  // })
+    let asNewborns = distributeChildren(entities, entities.length, randLoc)
+    return newborns.concat(asNewborns)
 }
+
+const distributeChildren = (entities, c, randLoc)=>{
+  let minEnergy =energyBounds(entities).min
+  let totalEnergy= entities.reduce((sum,e)=>sum+(e.energy - minEnergy),0)
+  let ePc = totalEnergy /c
+
+  let children = []
+  let etoSpend = totalEnergy
+  let i =0;
+  while(totalEnergy>1){
+    let eEngery = entities[i].energy - minEnergy
+    while(eEngery>1){
+      eEngery -= ePc
+      let newborn = new creature(randLoc())
+      newborn.setGenome(mutateGenome(entities[i].getGenome(),0.5))
+      children.push(newborn)
+    }
+    totalEnergy -= entities[i].energy - minEnergy
+    i++
+  }
+  return children
+}
+
 
 const generateCrossovers = (entities)=>{
   let crossovers = entities.map(e=>{
     return crossGenomes(e.getGenome(),
                         entities[0].getGenome(),
-                        Math.random()*0.5)
+                        Math.random()*0.3)
   })
   return crossovers
 }

@@ -2,12 +2,11 @@ import V from './vector.js';
 import synaptic from 'synaptic'
 import food from './food.js';
 
-
 class Creature {
   constructor(p) {
     this.p = p
     this.v = (new V()).random()
-    this.network = new synaptic.Architect.Perceptron(11, 24,24, 2);
+    this.network = new synaptic.Architect.Perceptron(9, 24, 2);
     this.energy = 0;
     this.radius = 6
     this.hue = 0;
@@ -19,11 +18,11 @@ class Creature {
   }
 
   tick(bounds,{fBin,cBin},speed){
-    let processedInputs = this.getInputs({fBin,cBin})
+    let processedInputs = this.getInputs({fBin,cBin},bounds)
     //this.p.copy().add(this.getInputs(neighbors))
     // debugger;
     let activation = this.activate(processedInputs)
-    this.move(activation,speed)
+    this.move(activation,speed,bounds)
     this.p.wrap(bounds)
     this.eat(fBin)
   }
@@ -37,10 +36,27 @@ class Creature {
       }
     })
   }
+  getClosestWall(bounds){
 
-  getInputs({fBin,cBin}){
+     let wallpoints = [(new V(this.p.x,0)),
+                       (new V(this.p.x,bounds.y)),
+                       (new V(0,this.p.y)),
+                       (new V(bounds.x,this.p.y))]
+
+     let closestwall = wallpoints.reduce((min,wp)=>{
+       if(this.p.dist(wp)<this.p.dist(min)){
+         return wp
+       }
+       return min
+     })
+     return closestwall
+  }
+
+  getInputs({fBin,cBin},bounds){
     let inputs = this.getFoodInputs(fBin)
     Object.assign(inputs, this.getCreatureInputs(cBin))
+    inputs.cw = this.getClosestWall(bounds).sub(this.p).normalize()
+    inputs.wd = Math.min(this.getClosestWall(bounds).dist(this.p)/ (200),0.99)
     return inputs
   }
 
@@ -62,9 +78,6 @@ class Creature {
             c1d: closestCreature.p.mag()/100
           }
   }
-  // getClosestWall(){
-    // if(this.p.x)/
-  // }
   getFoodInputs(entities){
     if(entities.length===0){
       return {COM:new V(0,0),
@@ -92,12 +105,16 @@ class Creature {
     input.push(processedInputs.f1.y);
     input.push(processedInputs.f1d); //5
 
+    //
+    // input.push(processedInputs.c1p.x);
+    // input.push(processedInputs.c1p.y);
+    // input.push(processedInputs.c1v.x);
+    // input.push(processedInputs.c1v.y);
+    // input.push(processedInputs.c1d); //10
 
-    input.push(processedInputs.c1p.x);
-    input.push(processedInputs.c1p.y);
-    input.push(processedInputs.c1v.x);
-    input.push(processedInputs.c1v.y);
-    input.push(processedInputs.c1d); //10
+    input.push(processedInputs.cw.x)
+    input.push(processedInputs.cw.y)
+    input.push(processedInputs.wd)
 
 
     input = input.map(i=>(i + 1) / 2)
@@ -113,12 +130,19 @@ class Creature {
     return (new V(output[0]-0.5,output[1]-0.5).normalize())
   }
 
-  move(a,d) {
+  move(a,d,bounds) {
     let aV = a.normalize()
     aV.div(2)
     this.v.add(aV)
     this.v.normalize()
-    this.p.add(this.v.copy().mul(d))
+
+    let nextP = this.p.copy().add(this.v.copy().mul(d))
+    if(nextP.dist(this.getClosestWall(bounds))>this.radius){
+      this.p = nextP
+    }
+    else {
+      this.p = this.p.copy().add(this.v.copy().mul(d*-2))
+    }
   }
   getGenome () {
         var genome = [];
@@ -154,9 +178,9 @@ class Creature {
     }
     setColor(){
       let c = this.getGenome()
-                .reduce((sum,w,i)=>sum + (Math.pow(1.01,i)*w),
+                .reduce((sum,w,i)=>sum + (Math.pow(1.04,i)*w),
                         0)
-      this.hue = (c / 500)|0
+      this.hue = Math.abs((c / 500))|0
     }
 
 }

@@ -29,8 +29,13 @@ const render = (ctx, creatures, foods, world, {max: maxEnergy, min: minEnergy}) 
   ctx.strokeStyle = "#aad"
   creatures.forEach(e=>{
     ctx.beginPath();
-    let fitness = (e.energy - minEnergy)/ ((maxEnergy-minEnergy)+0.1)
-    ctx.fillStyle = husl.toHex((e.hue|0), (Math.max(fitness,0.1)*99)|0, 60)
+    let fitness = Math.max(Math.min((e.energy - minEnergy)/ (maxEnergy-minEnergy),1),0.1)
+    ctx.fillStyle = husl.toHex((e.hue|0), (fitness*99)|0, 60)
+    // try{}
+    // catch(a){
+      // debugger
+    // }
+    // `hsl(${e.hue},${fitness*99}%,50%)`
     ctx.arc(e.p.x|0,e.p.y|0, e.radius, e.angle - sweep, e.angle +sweep);
     ctx.stroke()
     ctx.fill();
