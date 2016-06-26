@@ -25,7 +25,7 @@ const render = (ctx, creatures, foods, world, {max: maxEnergy, min: minEnergy}) 
     ctx.stroke()
   })
   // ctx.fill();
-  ctx.lineWidth=0.7;
+  ctx.lineWidth=1.7;
   ctx.strokeStyle = "#aad"
   creatures.forEach(e=>{
     ctx.beginPath();

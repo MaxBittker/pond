@@ -53,6 +53,7 @@ const newGeneration = (eBounds)=>{
   UI.setGeneration(g)
   console.log("generation: " + g+ " f: " +(eBounds.max/ (eBounds.min+0.1)))
   creatures = nBest(creatures,(population/3)|0)
+  console.log(creatures[0].getGenome())
   creatures = creatures.concat(
                                 // buildGeneration(creatures,randomLoc,0.1),
                                 // buildGeneration(creatures,randomLoc,0.2),
