@@ -12,14 +12,18 @@ body{
 }
 canvas{
   margin: auto;
+  margin-top: 25px;
 }
 #speed{
     width: 100%;
 }
 .controls{
+  width: 100%;
+  max-width: 800px;
+  margin: auto;
   padding: 10px;
   display: flex;
-  justify-content: space-around;
+  justify-content:space-between;
   align-content: center;
 }
 
