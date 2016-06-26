@@ -3,7 +3,7 @@ import creature from './creature.js';
 import food from './food.js';
 
 import V from './vector.js';
-import { energyBounds, nBest, buildGeneration } from './genetics.js';
+import { foundfoodBounds, nBest, buildGeneration } from './genetics.js';
 import { render } from './render.js';
 import {ui} from './ui.js';
 
@@ -58,7 +58,18 @@ const newGeneration = (eBounds)=>{
                                 // buildGeneration(creatures,randomLoc,0.1),
                                 // buildGeneration(creatures,randomLoc,0.2),
                                 buildGeneration(creatures,randomLoc,0.3))
-  creatures = creatures.map(c=>{c.energy = 0
+  creatures = creatures.map(c=>{c.foundfood = 0
+                                return c})
+}
+
+const birthEvent = (eBounds)=>{
+  creatures = nBest(creatures, (population - 1 | 0))
+  // console.log(creatures[0].getGenome())
+  creatures = creatures.concat(
+    buildGeneration(creatures,
+                    (population - creatures.length),
+                    randomLoc,0.3))
+  creatures = creatures.map(c=>{c.foundfood = 0
                                 return c})
 }
 
@@ -71,9 +82,12 @@ const step = ()=> {
     updateMap(foodMap,foods)
     updateMap(creatureMap,creatures)
 
-    const eBounds = energyBounds(creatures)
+    const eBounds = foundfoodBounds(creatures)
 
-    everyNFrames(gTime,()=>newGeneration(eBounds))
+    // everyNFrames(gTime,()=>newGeneration(eBounds))
+    if(creatures.length < population * (3/4) ){
+      birthEvent(eBounds)
+    }
     if(UI.shouldNG()){
       newGeneration(eBounds)
     }
@@ -85,6 +99,8 @@ const step = ()=> {
     })
 
     foods = foods.filter(f=>!f.marked)
+    creatures = creatures.filter(f=>f.energy>0)
+
 
     everyNFrames(UI.speed,()=>{
       render(ctx,creatures,foods,foodMap, eBounds)

@@ -3,17 +3,17 @@ import synaptic from 'synaptic'
 import creature from './creature.js';
 
 
-const energyBounds = entities => {
-  let max = entities.reduce((max,e)=>Math.max(max,e.energy),0)
-  let min = entities.reduce((min,e)=>Math.min(min,e.energy),Infinity)
+const foundfoodBounds = entities => {
+  let max = entities.reduce((max,e)=>Math.max(max,e.foundfood),0)
+  let min = entities.reduce((min,e)=>Math.min(min,e.foundfood),Infinity)
   return {max, min}
 }
 
 
 const nBest = (entities,n) => {
-  entities.sort((a,b)=>b.energy-a.energy)
+  entities.sort((a,b)=>b.foundfood-a.foundfood)
   let genString = entities.map((e,i)=>{
-     let s= e.energy
+     let s= e.foundfood
     if(i===n){
       s+=">Cutoff>"
     }
@@ -23,8 +23,8 @@ const nBest = (entities,n) => {
   return entities.slice(0,n)
 }
 
-
-const buildGeneration = (entities, randLoc, factor) => {
+// const birthOne
+const buildGeneration = (entities, n, randLoc, factor) => {
   let crossovers = generateCrossovers(entities)
 
   let newborns =crossovers.map(genome=>{
@@ -33,32 +33,27 @@ const buildGeneration = (entities, randLoc, factor) => {
     return newborn
   })
 
-  // let asNewborns =entities.map(parent=>{
-  //   let newborn = new creature(randLoc())
-  //   newborn.setGenome(mutateGenome(parent.getGenome(),0.4))
-  //   return newborn
-  // })
     let asNewborns = distributeChildren(entities, entities.length, randLoc)
-    return newborns.concat(asNewborns)
+    return newborns.concat(asNewborns).slice(n)
 }
 
 const distributeChildren = (entities, c, randLoc)=>{
-  let minEnergy =energyBounds(entities).min
-  let totalEnergy= entities.reduce((sum,e)=>sum+(e.energy - minEnergy),0)
-  let ePc = totalEnergy /c
+  let minfoundfood =foundfoodBounds(entities).min
+  let totalfoundfood= entities.reduce((sum,e)=>sum+(e.foundfood - minfoundfood),0)
+  let ePc = totalfoundfood /c
 
   let children = []
-  let etoSpend = totalEnergy
+  let etoSpend = totalfoundfood
   let i =0;
-  while(totalEnergy>1){
-    let eEngery = entities[i].energy - minEnergy
+  while(totalfoundfood>1){
+    let eEngery = entities[i].foundfood - minfoundfood
     while(eEngery>1){
       eEngery -= ePc
       let newborn = new creature(randLoc())
       newborn.setGenome(mutateGenome(entities[i].getGenome(),0.5))
       children.push(newborn)
     }
-    totalEnergy -= entities[i].energy - minEnergy
+    totalfoundfood -= entities[i].foundfood - minfoundfood
     i++
   }
   return children
@@ -106,4 +101,4 @@ const crossGenomes = (g1, g2, factor) => {
 
 
 
-export {energyBounds, nBest, buildGeneration, generateCrossovers}
+export {foundfoodBounds, nBest, buildGeneration, generateCrossovers}

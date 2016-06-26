@@ -7,7 +7,8 @@ class Creature {
     this.p = p
     this.v = (new V()).random()
     this.network = new synaptic.Architect.Perceptron(9, 24, 10, 2);
-    this.energy = 0;
+    this.foundfood = 10;
+    this.energy = 200 * ((Math.random() * 0.5) + 1);
     this.radius = 6
     this.hue = 0;
     this.setColor()
@@ -21,6 +22,7 @@ class Creature {
     let processedInputs = this.getInputs({fBin,cBin},bounds)
     //this.p.copy().add(this.getInputs(neighbors))
     // debugger;
+    this.energy--
     let activation = this.activate(processedInputs)
     this.move(activation,speed,bounds)
     this.p.wrap(bounds)
@@ -32,7 +34,8 @@ class Creature {
     neighbors.forEach(n=>{
       if(n instanceof food && this.p.dist(n.p) < this.radius){
         n.marked = true
-        this.energy+=1;
+        this.foundfood+=1;
+        this.energy+=100;
       }
     })
   }

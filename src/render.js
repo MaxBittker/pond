@@ -1,5 +1,5 @@
 import husl from 'husl'
-const render = (ctx, creatures, foods, world, {max: maxEnergy, min: minEnergy}) => {
+const render = (ctx, creatures, foods, world, {max: maxfoundfood, min: minfoundfood}) => {
   const {height, width} = ctx.canvas
 
   for(let x = 0; x < world.maxTiles.x; x+=1){
@@ -29,7 +29,7 @@ const render = (ctx, creatures, foods, world, {max: maxEnergy, min: minEnergy}) 
   ctx.strokeStyle = "#aad"
   creatures.forEach(e=>{
     ctx.beginPath();
-    let fitness = Math.max(Math.min((e.energy - minEnergy)/ (maxEnergy-minEnergy),1),0.1)
+    let fitness = Math.max(Math.min((e.foundfood - minfoundfood)/ (maxfoundfood-minfoundfood),1),0.1)
     ctx.fillStyle = husl.toHex((e.hue|0), (fitness*99)|0, 60)
     // try{}
     // catch(a){
