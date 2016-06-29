@@ -18,10 +18,9 @@ class Creature {
   }
 
   tick(bounds,{fBin,cBin},speed){
-    let processedInputs = this.getInputs({fBin,cBin},bounds)
-    //this.p.copy().add(this.getInputs(neighbors))
-    // debugger;
-    let activation = this.activate(processedInputs)
+    let packedInputs = this.getInputs({fBin,cBin},bounds)
+
+    let activation = this.activate(packedInputs)
     this.move(activation,speed,bounds)
     this.p.wrap(bounds)
     this.eat(fBin)
@@ -57,7 +56,29 @@ class Creature {
     Object.assign(inputs, this.getCreatureInputs(cBin))
     inputs.cw = this.getClosestWall(bounds).sub(this.p).normalize()
     inputs.wd = Math.min(this.getClosestWall(bounds).dist(this.p)/ (200),0.99)
-    return inputs
+
+    var packedInputs = [];
+    packedInputs.push(inputs.COM.x);//0
+    packedInputs.push(inputs.COM.y);//1
+    packedInputs.push(inputs.f1.x);//2
+    packedInputs.push(inputs.f1.y);//3
+    packedInputs.push(inputs.f1d); //4
+    //
+    // packedInputs.push(inputs.c1p.x);
+    // packedInputs.push(inputs.c1p.y);
+    // packedInputs.push(inputs.c1v.x);
+    // packedInputs.push(inputs.c1v.y);
+    // packedInputs.push(inputs.c1d); //10
+
+    packedInputs.push(inputs.cw.x)
+    packedInputs.push(inputs.cw.y)
+    packedInputs.push(inputs.wd)
+
+
+    packedInputs = packedInputs.map(i=>(i + 1) / 2)
+    packedInputs.push(Math.random());
+
+    return packedInputs
   }
 
   getCreatureInputs(creatures){
@@ -94,36 +115,12 @@ class Creature {
     },(new V(0,0)))
     return {COM:  sum.div(entities.length).sub(this.p).normalize(),
             f1:   closestfood.copy().sub(this.p).normalize(),
-            f1d:  closestfood.copy().mag()/ (100)
+            f1d:  closestfood.copy().sub(this.p).mag()/ (141)
           }
   }
-  activate(processedInputs) {
-    var input = [];
-    input.push(processedInputs.COM.x);
-    input.push(processedInputs.COM.y);
-    input.push(processedInputs.f1.x);
-    input.push(processedInputs.f1.y);
-    input.push(processedInputs.f1d); //5
 
-    //
-    // input.push(processedInputs.c1p.x);
-    // input.push(processedInputs.c1p.y);
-    // input.push(processedInputs.c1v.x);
-    // input.push(processedInputs.c1v.y);
-    // input.push(processedInputs.c1d); //10
-
-    input.push(processedInputs.cw.x)
-    input.push(processedInputs.cw.y)
-    input.push(processedInputs.wd)
-
-
-    input = input.map(i=>(i + 1) / 2)
-    input.push(Math.random());
-
-
-
-    var output = this.network.activate(input);
-
+  activate(packedInputs) {
+    var output = this.network.activate(packedInputs);
     // var learningRate = .01;
     // var target = [Math.random(),Math.random()];
     // this.network.propagate(learningRate, target);
