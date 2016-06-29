@@ -55,11 +55,11 @@ const newGeneration = (eBounds)=>{
   UI.setGeneration(g)
   console.log("generation: " + g+ " f: " +(eBounds.max/ (eBounds.min+0.1)))
   creatures = nBest(creatures,(population/3)|0)
-  console.log(creatures[0].getGenome())
+  // console.log(creatures[0].getGenome())
   creatures = creatures.concat(
                                 // buildGeneration(creatures,randomLoc,0.1),
                                 // buildGeneration(creatures,randomLoc,0.2),
-                                buildGeneration(creatures,randomLoc,0.3))
+                                buildGeneration(creatures,randomLoc,0.3, snapshots))
   creatures = creatures.map(c=>{c.energy = 0; return c})
   snapshots = []
 }
@@ -83,7 +83,7 @@ const step = ()=> {
       let fBin = foodMap.getNeighbors(c.p)
       let cBin = creatureMap.getNeighbors(c.p)
 
-      if(snapshots.length < 1000 && (t%50 === 10)){
+      if(snapshots.length < 500 && (t%100 === 10)){
         snapshots.push(c.getInputs({fBin, cBin}, {x:width,y:height}))
       }
 

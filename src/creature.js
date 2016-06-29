@@ -6,7 +6,7 @@ class Creature {
   constructor(p) {
     this.p = p
     this.v = (new V()).random()
-    this.network = new synaptic.Architect.Perceptron(9, 24, 2);
+    this.network = new synaptic.Architect.Perceptron(8, 24, 8, 2);
     this.energy = 0;
     this.radius = 6
     this.hue = 0;
@@ -68,15 +68,15 @@ class Creature {
     // packedInputs.push(inputs.c1p.y);
     // packedInputs.push(inputs.c1v.x);
     // packedInputs.push(inputs.c1v.y);
-    // packedInputs.push(inputs.c1d); //10
+    // packedInputs.push(inputs.c1d); //9
 
-    packedInputs.push(inputs.cw.x)
-    packedInputs.push(inputs.cw.y)
-    packedInputs.push(inputs.wd)
+    packedInputs.push(inputs.cw.x) //5//10
+    packedInputs.push(inputs.cw.y) //6//11
+    packedInputs.push(inputs.wd) //7//12
 
 
     packedInputs = packedInputs.map(i=>(i + 1) / 2)
-    packedInputs.push(Math.random());
+    // packedInputs.push(Math.random());
 
     return packedInputs
   }
@@ -96,7 +96,7 @@ class Creature {
     })
     return {c1p: closestCreature.p.copy().sub(this.p).normalize(),
             c1v: closestCreature.v.copy().normalize(),
-            c1d: closestCreature.p.mag()/100
+            c1d: closestCreature.p.copy().sub(this.p).mag()/ 141
           }
   }
   getFoodInputs(entities){
