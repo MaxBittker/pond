@@ -36,6 +36,8 @@
       <p> Usually, neurogenetic algorithms use a child creation algorithm based on naively combining network weights from one parent with weights from the other. This approach has the drawback of destroying semantically similar but differently configured sets of weights. This system builds children by cloning one parent and teaching the result (the "apprentice") to behave more similarly to the other parent (the "tutor") using backpropagation of the tutor's output on a set of recorded input snapshots seen during the preceding generation's life. In biological terms, the child is created in a method that aims to preserve phenotypical properties over genetic ones.  </p>
       <p> If you're interested in seeing more artificial evolution experiments like this one, I recommend checking out <a href="http://blog.otoro.net/2015/05/07/creatures-avoiding-planks/">creatures avoiding planks</a> or the 1996 research project/game  <a href="http://www.ventrella.com/darwin/darwin.html">Darwin Pond</a>.
       </p>
+      <h5> What are the squares? </h4>
+      <p> To make collision detection more efficient, a spatial hash data structure (binning) is built and maintained. I rendered it and mapped density to hue for debugging, but kept it because it looks kind of cool. </p>
       <p> Feel free to ask questions <a href="https://twitter.com/maxbittker"> @MaxBittker</a> or check out more of my work at <a href="https://maxbittker.github.io/">  maxbittker.github.io </a>
       </p>
     </div>
