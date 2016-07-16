@@ -6,7 +6,7 @@ class Creature {
   constructor(p) {
     this.p = p
     this.v = (new V()).random()
-    this.network = new synaptic.Architect.Perceptron(8, 24, 8, 2);
+    this.network = new synaptic.Architect.Perceptron(8, 24,2);
     this.energy = 0;
     this.radius = 6
     this.hue = 0;
