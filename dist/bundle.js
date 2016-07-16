@@ -149,7 +149,7 @@
 	    var fBin = foodMap.getNeighbors(c.p);
 	    var cBin = creatureMap.getNeighbors(c.p);
 
-	    if (snapshots.length < 500 && t % 100 === 10) {
+	    if (snapshots.length < 1000 && t % 100 === 10) {
 	      snapshots.push(c.getInputs({ fBin: fBin, cBin: cBin }, { x: width, y: height }));
 	    }
 
@@ -3254,7 +3254,7 @@
 
 	    this.p = p;
 	    this.v = new _vector2.default().random();
-	    this.network = new _synaptic2.default.Architect.Perceptron(8, 24, 2);
+	    this.network = new _synaptic2.default.Architect.Perceptron(8, 20, 8, 2);
 	    this.energy = 0;
 	    this.radius = 6;
 	    this.hue = 0;

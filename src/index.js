@@ -83,7 +83,7 @@ const step = ()=> {
       let fBin = foodMap.getNeighbors(c.p)
       let cBin = creatureMap.getNeighbors(c.p)
 
-      if(snapshots.length < 500 && (t%100 === 10)){
+      if(snapshots.length < 1000 && (t%100 === 10)){
         snapshots.push(c.getInputs({fBin, cBin}, {x:width,y:height}))
       }
 
