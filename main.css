@@ -1,7 +1,15 @@
+@import 'https://fonts.googleapis.com/css?family=Inconsolata';
+@import 'https://fonts.googleapis.com/css?family=Slabo+27px';
+
+
+
 *{
   margin: 0;
+  font-family: 'Slabo 27px', serif;
+
 }
 html{
+  background-color: #eee;
 background-image: url("http://www.transparenttextures.com/patterns/cream-paper.png");
 }
 body{
@@ -14,10 +22,14 @@ canvas{
   margin: auto;
   margin-top: 25px;
 }
-#speed{
-    width: 100%;
+
+.controls * {
+  font-family: 'Inconsolata', monospace;
+  font-size: 17px;
+
 }
 .controls{
+
   width: 100%;
   max-width: 800px;
   margin: auto;
@@ -25,14 +37,64 @@ canvas{
   display: flex;
   justify-content:space-between;
   align-content: center;
+
 }
 
 .controls h5{
   display: inline;
+
 }
 
+.buttonGroup{
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+}
 .readme{
   max-width: 800px;
   padding: 0 10px;
   margin: auto;
+}
+p, h1, h2,h6{
+  margin-bottom: 10px;
+}
+button{
+  background-color: #eee;
+  border: 0.2px solid #010101;
+  border-radius: 3px;
+}
+#mr{
+  display: inline-block;
+  min-width: 70px !important;
+}
+
+input[type=range] {
+  -webkit-appearance: none;
+  margin: 18px 0;
+  width: 80%;
+}
+input[type=range]:focus {
+  outline: none;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 10px;
+  cursor: pointer;
+  border-radius: 1.3px;
+  border: 0.2px solid #010101;
+  background-color: #eee;
+
+}
+input[type=range]::-webkit-slider-thumb {
+  border: 1px solid #000000;
+  height: 16px;
+  width: 16px;
+  border-radius: 50px;
+  background: #ffffff;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -4px;
+}
+input[type=range]:focus::-webkit-slider-thumb {
+  background: #aaa;
 }

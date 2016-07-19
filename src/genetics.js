@@ -26,20 +26,18 @@ const nBest = (entities,n) => {
 
 const buildGeneration = (entities, randLoc, factor,snapshots) => {
   // let crossovers = generateCrossovers(entities)
-
   // let newborns =crossovers.map(genome=>{
   //   let newborn = new creature(randLoc())
   //   newborn.setGenome(genome)
   //   return newborn
   // })
-
-    let asNewborns = distributeChildren(entities, entities.length, randLoc)
-    let PhenoNewborns = generatePhenoChildren(entities, entities.length, randLoc, snapshots)
+    let asNewborns = distributeChildren(entities, entities.length,factor, randLoc)
+    let PhenoNewborns = generatePhenoChildren(entities, entities.length, factor, randLoc, snapshots)
 
     return PhenoNewborns.concat(asNewborns)
 }
 
-const distributeChildren = (entities, c, randLoc)=>{
+const distributeChildren = (entities, c, factor, randLoc)=>{
   let minEnergy =energyBounds(entities).min
   let totalEnergy= entities.reduce((sum,e)=>sum+(e.energy - minEnergy),0)
   let ePc = totalEnergy /c
@@ -52,7 +50,7 @@ const distributeChildren = (entities, c, randLoc)=>{
     while(eEngery>1){
       eEngery -= ePc
       let newborn = new creature(randLoc())
-      newborn.setGenome(mutateGenome(entities[i].getGenome(),0.5))
+      newborn.setGenome(mutateGenome(entities[i].getGenome(),factor))
       children.push(newborn)
     }
     totalEnergy -= entities[i].energy - minEnergy
@@ -71,7 +69,7 @@ const distributeChildren = (entities, c, randLoc)=>{
 //   return crossovers
 // }
 
-const generatePhenoChildren = (entities, c, randLoc, snapshots)=>{
+const generatePhenoChildren = (entities, c,factor, randLoc, snapshots)=>{
   let minEnergy = energyBounds(entities).min
   let totalEnergy= entities.reduce((sum,e)=>sum+(e.energy - minEnergy),0)
   let ePc = totalEnergy /c

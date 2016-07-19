@@ -4,7 +4,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>neuroevolution pond</title>
     <link rel="stylesheet" type="text/css" href="main.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.css" type="text/css">
 
     </head>
   <body>
@@ -16,16 +15,20 @@
       <input type="range" id="speed" name="Speed" min="1" max="100" value="2" step="1">
     </span>
     <span>
+      <h5>Mutation Rate:  <span id="mr">Normal</span></h5>
+      <input type="range" id="mutation" name="Mutation" min="10" max="150" value="55" step="1">
+    </span>
+    <span class="buttonGroup">
+      <span>
       <h5>
         Generation:
       </h5>
       <h5 id="generation">
         0
       </h5>
-    </span>
-    <span>
-      <button id="triggerG">New Generation</button>
-    </br>
+      </span>
+
+      <button id="triggerG"><h5>New Generation</h5></button>
     </span>
     </div>
     <div class="readme">
@@ -34,11 +37,13 @@
       <p> The creatures are ranked by their fitness (quantity of food found), and the most successful creatures are colored most brightly. Periodically the worst performing creatures are removed while the best performers are given offspring whose brain wirings are based on their parents', plus a random set of mutations.</p>
       <p> Over time, these random mutations and pairings coupled with the selection process result in creatures that are increasingly adept at navigating their surroundings and securing food. If you leave this page running for many generations, you'll be able to observe the results. This process is analogous to the natural phenomenon of evolution.</p>
       <p> Usually, genetic algorithms use a child creation algorithm based on naively combining traits from one parent with traits from the other. When these traits are the weights of a neural network with hidden nodes, this approach has the drawback of destroying semantically similar but differently configured sets of weights. This is known as the "Competing Conventions Problem" or the "Permutations Problem" - when there are many equivalent but incompatible ways to express a strategy in a neural network, genomes representing the same solution do not route that information through the same hidden nodes, and crossover is highly likely to produce invalid (dramatically less fit) offspring.</p>
-      <p>This system's solution to that problem is to build children by cloning one parent and teaching that clone (the "apprentice") to behave more similarly to the other parent (the "tutor") using backpropagation of the tutor's output on a set of recorded input snapshots seen during the preceding generation's life. In biological terms, the child is created in a method that aims to preserve <i>phenotypical</i> properties over genetic ones. In the future, I would like to improve this method to involve clustering of the input samples, and then training a child on parent A's reactions to input cluster A, and parent B's reactions to input cluser B.</p>
+      <p>This system's solution to that problem is to replace genetic crossover (genome of parents directly recombining to create children) with simulated "tutoring" process. In this process, a child is first created by cloning one of the parents. Then, we take a set of snapshots of inputs from the previous generation's lifetime, and record the other parent's repsonse to each input snapshot. These pairs of inputs and responses are used as training pairs to do backpropagation training on the child, teaching that child to respond to inputs more similarly to the parent. In biological terms, the child is created in a method that aims to transfer <i>phenotypical</i> properties over genetic ones.</p><p> In the future, I would like to improve this method by performing clustering on the input samples, assigning each cluster of input samples to one parent or the other, and then training the child on both sets.</p>
       <p> If you're interested in seeing more artificial evolution experiments like this one, I recommend checking out <a href="http://blog.otoro.net/2015/05/07/creatures-avoiding-planks/">creatures avoiding planks</a> or the 1996 research project/game  <a href="http://www.ventrella.com/darwin/darwin.html">Darwin Pond</a>. A more established solution for the Competing conventions problem is the use of the <a href ="https://en.wikipedia.org/wiki/Neuroevolution_of_augmenting_topologies">NeuroEvolution of Augmenting Topologies (NEAT)</a> Algorithm, which modifies topology between creatures and maintains a concept of seperate species and uses these subdivisions to inform the way weights can be shared between creatures.
       </p>
-      <h5> What are the squares? </h4>
+      <br>
+      <h4> What are the squares? </h4>
       <p> To make collision detection more efficient, a spatial hash data structure (binning) is built and maintained. I rendered it and mapped density to hue for debugging, but kept it because it looks kind of cool. </p>
+      <br>
       <p> Feel free to ask questions <a href="https://twitter.com/maxbittker"> @MaxBittker</a> or check out more of my work at <a href="https://maxbittker.github.io/">  maxbittker.github.io </a>
       </p>
     </div>

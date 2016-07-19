@@ -14,12 +14,23 @@ let UI = new ui()
 
 const c = document.getElementById("canvas");
 const ctx = c.getContext("2d");
+
+
+
 const {width, height} = ctx.canvas
 
 let t = 1
 let population = 50
 let creatures = []
 let foods = []
+c.onmousedown = e => {
+  let p = new V(e.offsetX,e.offsetY)
+  for(var i =0; i<5; i++){
+    foods.push(new food(p))
+  }
+  e.preventDefault()
+}
+
 let foodMap = new world(width, height, 50)
 let creatureMap = new world(width, height, 50)
 
@@ -42,41 +53,41 @@ const updateMap = (emap, entityArray) => {
   emap.buildMap(entityArray)
 }
 
-
 for(var i=0; i<100 ;i+=1){
   creatures.push(new creature(randomLoc()))
 }
 let gTime = 3000
-
+let deadFramesN = 0;
+let lastGeneration = t;
 let snapshots = []
 
+
 const newGeneration = (eBounds)=>{
+  deadFramesN = 0;
+  lastGeneration = t;
+
   let g = (t/gTime) |0
-  UI.setGeneration(g)
+  UI.incGeneration()
   console.log("generation: " + g+ " f: " +(eBounds.max/ (eBounds.min+0.1)))
   creatures = nBest(creatures,(population/3)|0)
   // console.log(creatures[0].getGenome())
-  creatures = creatures.concat(
-                                // buildGeneration(creatures,randomLoc,0.1),
-                                // buildGeneration(creatures,randomLoc,0.2),
-                                buildGeneration(creatures,randomLoc,0.3, snapshots))
+  creatures = creatures.concat(buildGeneration(creatures,randomLoc,UI.mutationRate, snapshots))
   creatures = creatures.map(c=>{c.energy = 0; return c})
   snapshots = []
 }
-
 const step = ()=> {
 
     while(foods.length<350){
       foods.push(genFood())
     }
-    foods[Math.random()*foods.length|0].marked = Math.random()>0.85
+    let foodRespawn = Math.random()>0.85
+    foods[Math.random()*foods.length|0].marked = foodRespawn
     updateMap(foodMap,foods)
     updateMap(creatureMap,creatures)
 
     const eBounds = energyBounds(creatures)
 
-    everyNFrames(gTime,()=>newGeneration(eBounds))
-    if(UI.shouldNG()){
+    if(UI.shouldNG()|| deadFramesN>200|| ((t-lastGeneration)>gTime)){
       newGeneration(eBounds)
     }
     creatures.forEach((c,i)=>{
@@ -89,7 +100,14 @@ const step = ()=> {
 
       c.tick({x:width,y:height},{fBin, cBin},UI.speed>1? 2 : 1)
     })
+    let foodsNum = foods.length
     foods = foods.filter(f=>!f.marked)
+    if(foodsNum - foods.length<(foodRespawn? 2 : 1)){
+      deadFramesN++
+      // console.log(deadFramesN)
+    } else {
+      deadFramesN = 0;
+    }
 
     everyNFrames(UI.speed,()=>{
       render(ctx,creatures,foods,foodMap, eBounds)

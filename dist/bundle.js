@@ -75,6 +75,7 @@
 
 	var c = document.getElementById("canvas");
 	var ctx = c.getContext("2d");
+
 	var _ctx$canvas = ctx.canvas;
 	var width = _ctx$canvas.width;
 	var height = _ctx$canvas.height;
@@ -84,6 +85,14 @@
 	var population = 50;
 	var creatures = [];
 	var foods = [];
+	c.onmousedown = function (e) {
+	  var p = new _vector2.default(e.offsetX, e.offsetY);
+	  for (var i = 0; i < 5; i++) {
+	    foods.push(new _food2.default(p));
+	  }
+	  e.preventDefault();
+	};
+
 	var foodMap = new _world2.default(width, height, 50);
 	var creatureMap = new _world2.default(width, height, 50);
 
@@ -109,40 +118,38 @@
 	  creatures.push(new _creature2.default(randomLoc()));
 	}
 	var gTime = 3000;
-
+	var deadFramesN = 0;
+	var lastGeneration = t;
 	var snapshots = [];
 
 	var newGeneration = function newGeneration(eBounds) {
+	  deadFramesN = 0;
+	  lastGeneration = t;
+
 	  var g = t / gTime | 0;
-	  UI.setGeneration(g);
+	  UI.incGeneration();
 	  console.log("generation: " + g + " f: " + eBounds.max / (eBounds.min + 0.1));
 	  creatures = (0, _genetics.nBest)(creatures, population / 3 | 0);
 	  // console.log(creatures[0].getGenome())
-	  creatures = creatures.concat(
-	  // buildGeneration(creatures,randomLoc,0.1),
-	  // buildGeneration(creatures,randomLoc,0.2),
-	  (0, _genetics.buildGeneration)(creatures, randomLoc, 0.3, snapshots));
+	  creatures = creatures.concat((0, _genetics.buildGeneration)(creatures, randomLoc, UI.mutationRate, snapshots));
 	  creatures = creatures.map(function (c) {
 	    c.energy = 0;return c;
 	  });
 	  snapshots = [];
 	};
-
 	var step = function step() {
 
 	  while (foods.length < 350) {
 	    foods.push(genFood());
 	  }
-	  foods[Math.random() * foods.length | 0].marked = Math.random() > 0.85;
+	  var foodRespawn = Math.random() > 0.85;
+	  foods[Math.random() * foods.length | 0].marked = foodRespawn;
 	  updateMap(foodMap, foods);
 	  updateMap(creatureMap, creatures);
 
 	  var eBounds = (0, _genetics.energyBounds)(creatures);
 
-	  everyNFrames(gTime, function () {
-	    return newGeneration(eBounds);
-	  });
-	  if (UI.shouldNG()) {
+	  if (UI.shouldNG() || deadFramesN > 200 || t - lastGeneration > gTime) {
 	    newGeneration(eBounds);
 	  }
 	  creatures.forEach(function (c, i) {
@@ -155,9 +162,16 @@
 
 	    c.tick({ x: width, y: height }, { fBin: fBin, cBin: cBin }, UI.speed > 1 ? 2 : 1);
 	  });
+	  var foodsNum = foods.length;
 	  foods = foods.filter(function (f) {
 	    return !f.marked;
 	  });
+	  if (foodsNum - foods.length < (foodRespawn ? 2 : 1)) {
+	    deadFramesN++;
+	    // console.log(deadFramesN)
+	  } else {
+	      deadFramesN = 0;
+	    }
 
 	  everyNFrames(UI.speed, function () {
 	    (0, _render.render)(ctx, creatures, foods, foodMap, eBounds);
@@ -3546,20 +3560,18 @@
 
 	var buildGeneration = function buildGeneration(entities, randLoc, factor, snapshots) {
 	  // let crossovers = generateCrossovers(entities)
-
 	  // let newborns =crossovers.map(genome=>{
 	  //   let newborn = new creature(randLoc())
 	  //   newborn.setGenome(genome)
 	  //   return newborn
 	  // })
-
-	  var asNewborns = distributeChildren(entities, entities.length, randLoc);
-	  var PhenoNewborns = generatePhenoChildren(entities, entities.length, randLoc, snapshots);
+	  var asNewborns = distributeChildren(entities, entities.length, factor, randLoc);
+	  var PhenoNewborns = generatePhenoChildren(entities, entities.length, factor, randLoc, snapshots);
 
 	  return PhenoNewborns.concat(asNewborns);
 	};
 
-	var distributeChildren = function distributeChildren(entities, c, randLoc) {
+	var distributeChildren = function distributeChildren(entities, c, factor, randLoc) {
 	  var minEnergy = energyBounds(entities).min;
 	  var totalEnergy = entities.reduce(function (sum, e) {
 	    return sum + (e.energy - minEnergy);
@@ -3574,7 +3586,7 @@
 	    while (eEngery > 1) {
 	      eEngery -= ePc;
 	      var newborn = new _creature2.default(randLoc());
-	      newborn.setGenome(mutateGenome(entities[i].getGenome(), 0.5));
+	      newborn.setGenome(mutateGenome(entities[i].getGenome(), factor));
 	      children.push(newborn);
 	    }
 	    totalEnergy -= entities[i].energy - minEnergy;
@@ -3592,7 +3604,7 @@
 	//   return crossovers
 	// }
 
-	var generatePhenoChildren = function generatePhenoChildren(entities, c, randLoc, snapshots) {
+	var generatePhenoChildren = function generatePhenoChildren(entities, c, factor, randLoc, snapshots) {
 	  var minEnergy = energyBounds(entities).min;
 	  var totalEnergy = entities.reduce(function (sum, e) {
 	    return sum + (e.energy - minEnergy);
@@ -4142,13 +4154,19 @@
 	    _classCallCheck(this, ui);
 
 	    this.speedSlider = document.getElementById("speed");
+	    this.mutationSlider = document.getElementById("mutation");
 	    this.generation = document.getElementById("generation");
+	    this.mrElement = document.getElementById("mr");
 	    this.triggerG = document.getElementById("triggerG");
 	    this.newG = false;
 	    this.speed = this.getSpeed();
-
+	    this.mutationRate = this.getMutation();
+	    this.g = 0;
 	    this.speedSlider.addEventListener("input", function () {
 	      _this.speed = _this.getSpeed();
+	    });
+	    this.mutationSlider.addEventListener("input", function () {
+	      _this.mutationRate = _this.getMutation();
 	    });
 	    this.triggerG.addEventListener("click", function () {
 	      _this.newG = true;
@@ -4156,9 +4174,10 @@
 	  }
 
 	  _createClass(ui, [{
-	    key: "setGeneration",
-	    value: function setGeneration(g) {
-	      this.generation.innerHTML = g.toString();
+	    key: "incGeneration",
+	    value: function incGeneration() {
+	      this.g++;
+	      this.generation.innerHTML = this.g.toString();
 	    }
 	  }, {
 	    key: "getSpeed",
@@ -4166,9 +4185,20 @@
 	      return this.shapeSpeed(this.speedSlider.valueAsNumber);
 	    }
 	  }, {
+	    key: "getMutation",
+	    value: function getMutation() {
+	      var rate = this.mutationSlider.valueAsNumber / 100;
+	      var rateAsText = "Low";
+	      if (rate > 0.2) rateAsText = "Moderate";
+	      if (rate > 0.5) rateAsText = "High";
+	      if (rate > 0.8) rateAsText = "Extreme";
+	      this.mrElement.innerHTML = rateAsText;
+	      return rate;
+	    }
+	  }, {
 	    key: "shapeSpeed",
 	    value: function shapeSpeed(raw) {
-	      return (Math.pow(raw / 10, 2.0) | 0) + 1;
+	      return (Math.pow(raw / 10, 1.6) | 0) + 1;
 	    }
 	  }, {
 	    key: "shouldNG",
