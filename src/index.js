@@ -25,8 +25,8 @@ let creatures = []
 let foods = []
 c.onmousedown = e => {
   let p = new V(e.offsetX,e.offsetY)
-  for(var i =0; i<5; i++){
-    foods.push(new food(p))
+  for(var i =0; i<8; i++){
+    foods.push(new food(p.copy().mul(0.95).add(randomLoc().mul(0.05))))//.sub(randomLoc().mul(0.024))))
   }
   e.preventDefault()
 }
@@ -35,8 +35,8 @@ let foodMap = new world(width, height, 50)
 let creatureMap = new world(width, height, 50)
 
 const randomLoc = ()=>{
-  return new V((0.025 + (0.95*Math.random()))*width,
-               (0.025 + (0.95*Math.random()))*height)
+  return new V((0.04 + (0.92*Math.random()))*width,
+               (0.04 + (0.92*Math.random()))*height)
 }
 const genFood = () =>  {
   return (new food(randomLoc()))
@@ -72,7 +72,7 @@ const newGeneration = (eBounds)=>{
   creatures = nBest(creatures,(population/3)|0)
   // console.log(creatures[0].getGenome())
   creatures = creatures.concat(buildGeneration(creatures,randomLoc,UI.mutationRate, snapshots))
-  creatures = creatures.map(c=>{c.energy = 0; return c})
+  creatures = creatures.map(c=>{c.energy = 0; c.p = new V(width/2,height/2);return c})
   snapshots = []
 }
 const step = ()=> {
@@ -94,7 +94,7 @@ const step = ()=> {
       let fBin = foodMap.getNeighbors(c.p)
       let cBin = creatureMap.getNeighbors(c.p)
 
-      if(snapshots.length < 2000 && (t%100 === 10)){
+      if(snapshots.length < 2500 && (t%50 === 25)){
         snapshots.push(c.getInputs({fBin, cBin}, {x:width,y:height}))
       }
 
@@ -108,7 +108,6 @@ const step = ()=> {
     } else {
       deadFramesN = 0;
     }
-
     everyNFrames(UI.speed,()=>{
       render(ctx,creatures,foods,foodMap, eBounds)
     })

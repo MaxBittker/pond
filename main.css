@@ -23,6 +23,7 @@ canvas{
   margin-top: 25px;
   width: 100%;
   max-width: 800px;
+  cursor:crosshair;
 }
 
 .controls * {
@@ -78,14 +79,21 @@ input[type=range] {
 input[type=range]:focus {
   outline: none;
 }
-input[type=range]::-webkit-slider-runnable-track {
+input[type=range]::-webkit-slider-runnable-track{
   width: 100%;
   height: 10px;
   cursor: pointer;
   border-radius: 1.3px;
   border: 0.2px solid #010101;
   background-color: #eee;
-
+}
+input[type=range]::-moz-range-track {
+  width: 100%;
+  height: 10px;
+  cursor: pointer;
+  border-radius: 1.3px;
+  border: 0.2px solid #010101;
+  background-color: #eee;
 }
 input[type=range]::-webkit-slider-thumb {
   border: 1px solid #000000;
@@ -94,9 +102,22 @@ input[type=range]::-webkit-slider-thumb {
   border-radius: 50px;
   background: #ffffff;
   cursor: pointer;
-  -webkit-appearance: none;
+  -webkit-appearance: none !important;
   margin-top: -4px;
 }
-input[type=range]:focus::-webkit-slider-thumb {
+input[type=range]::-moz-range-thumb{
+  border: 1px solid #000000;
+  height: 16px;
+  width: 16px;
+  border-radius: 50px;
+  background: #ffffff;
+  cursor: pointer;
+  -webkit-appearance: none !important;
+  margin-top: -4px;
+  background-color:#fff;
+}
+
+input[type=range]:focus::-webkit-slider-thumb,
+input[type=range]:focus::-moz-range-thumb  {
   background: #aaa;
 }

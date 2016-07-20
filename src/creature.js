@@ -6,7 +6,7 @@ class Creature {
   constructor(p) {
     this.p = p
     this.v = (new V()).random()
-    this.network = new synaptic.Architect.Perceptron(8, 20, 8, 2);
+    this.network = new synaptic.Architect.Perceptron(13, 26, 8, 2);
     this.energy = 0;
     this.radius = 6
     this.hue = 0;
@@ -64,11 +64,11 @@ class Creature {
     packedInputs.push(inputs.f1.y);//3
     packedInputs.push(inputs.f1d); //4
     //
-    // packedInputs.push(inputs.c1p.x);
-    // packedInputs.push(inputs.c1p.y);
-    // packedInputs.push(inputs.c1v.x);
-    // packedInputs.push(inputs.c1v.y);
-    // packedInputs.push(inputs.c1d); //9
+    packedInputs.push(inputs.c1p.x);
+    packedInputs.push(inputs.c1p.y);
+    packedInputs.push(inputs.c1v.x);
+    packedInputs.push(inputs.c1v.y);
+    packedInputs.push(inputs.c1d); //9
 
     packedInputs.push(inputs.cw.x) //5//10
     packedInputs.push(inputs.cw.y) //6//11
@@ -139,6 +139,7 @@ class Creature {
     }
     else {
       this.p = this.p.copy().add(this.v.copy().mul(d*-2))
+      this.v.mul(-1)
     }
   }
   getGenome () {
