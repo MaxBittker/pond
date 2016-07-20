@@ -87,8 +87,8 @@
 	var foods = [];
 	c.onmousedown = function (e) {
 	  var p = new _vector2.default(e.offsetX, e.offsetY);
-	  for (var i = 0; i < 5; i++) {
-	    foods.push(new _food2.default(p));
+	  for (var i = 0; i < 8; i++) {
+	    foods.push(new _food2.default(p.copy().mul(0.95).add(randomLoc().mul(0.05)))); //.sub(randomLoc().mul(0.024))))
 	  }
 	  e.preventDefault();
 	};
@@ -97,7 +97,7 @@
 	var creatureMap = new _world2.default(width, height, 50);
 
 	var randomLoc = function randomLoc() {
-	  return new _vector2.default((0.025 + 0.95 * Math.random()) * width, (0.025 + 0.95 * Math.random()) * height);
+	  return new _vector2.default((0.04 + 0.92 * Math.random()) * width, (0.04 + 0.92 * Math.random()) * height);
 	};
 	var genFood = function genFood() {
 	  return new _food2.default(randomLoc());
@@ -133,7 +133,7 @@
 	  // console.log(creatures[0].getGenome())
 	  creatures = creatures.concat((0, _genetics.buildGeneration)(creatures, randomLoc, UI.mutationRate, snapshots));
 	  creatures = creatures.map(function (c) {
-	    c.energy = 0;return c;
+	    c.energy = 0;c.p = new _vector2.default(width / 2, height / 2);return c;
 	  });
 	  snapshots = [];
 	};
@@ -156,7 +156,7 @@
 	    var fBin = foodMap.getNeighbors(c.p);
 	    var cBin = creatureMap.getNeighbors(c.p);
 
-	    if (snapshots.length < 2000 && t % 100 === 10) {
+	    if (snapshots.length < 2500 && t % 50 === 25) {
 	      snapshots.push(c.getInputs({ fBin: fBin, cBin: cBin }, { x: width, y: height }));
 	    }
 
@@ -172,7 +172,6 @@
 	  } else {
 	      deadFramesN = 0;
 	    }
-
 	  everyNFrames(UI.speed, function () {
 	    (0, _render.render)(ctx, creatures, foods, foodMap, eBounds);
 	  });
@@ -3268,7 +3267,7 @@
 
 	    this.p = p;
 	    this.v = new _vector2.default().random();
-	    this.network = new _synaptic2.default.Architect.Perceptron(8, 20, 8, 2);
+	    this.network = new _synaptic2.default.Architect.Perceptron(13, 26, 8, 2);
 	    this.energy = 0;
 	    this.radius = 6;
 	    this.hue = 0;
@@ -3335,11 +3334,11 @@
 	      packedInputs.push(inputs.f1.y); //3
 	      packedInputs.push(inputs.f1d); //4
 	      //
-	      // packedInputs.push(inputs.c1p.x);
-	      // packedInputs.push(inputs.c1p.y);
-	      // packedInputs.push(inputs.c1v.x);
-	      // packedInputs.push(inputs.c1v.y);
-	      // packedInputs.push(inputs.c1d); //9
+	      packedInputs.push(inputs.c1p.x);
+	      packedInputs.push(inputs.c1p.y);
+	      packedInputs.push(inputs.c1v.x);
+	      packedInputs.push(inputs.c1v.y);
+	      packedInputs.push(inputs.c1d); //9
 
 	      packedInputs.push(inputs.cw.x); //5//10
 	      packedInputs.push(inputs.cw.y); //6//11
@@ -3421,6 +3420,7 @@
 	        this.p = nextP;
 	      } else {
 	        this.p = this.p.copy().add(this.v.copy().mul(d * -2));
+	        this.v.mul(-1);
 	      }
 	    }
 	  }, {
