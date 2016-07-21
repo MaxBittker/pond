@@ -6,7 +6,7 @@ class Creature {
   constructor(p) {
     this.p = p
     this.v = (new V()).random()
-    this.network = new synaptic.Architect.Perceptron(13, 26, 8, 2);
+    this.network = new synaptic.Architect.Perceptron(9, 16, 6, 1);
     this.energy = 0;
     this.radius = 6
     this.hue = 0;
@@ -57,28 +57,36 @@ class Creature {
     inputs.cw = this.getClosestWall(bounds).sub(this.p).normalize()
     inputs.wd = Math.min(this.getClosestWall(bounds).dist(this.p)/ (200),0.99)
 
-    var packedInputs = [];
-    packedInputs.push(inputs.COM.x);//0
-    packedInputs.push(inputs.COM.y);//1
-    packedInputs.push(inputs.f1.x);//2
-    packedInputs.push(inputs.f1.y);//3
-    packedInputs.push(inputs.f1d); //4
+    var xInputs = [];
+    var yInputs = [];
+    xInputs.push(0.1);//0
+    yInputs.push(0.9);//1
+
+    xInputs.push(inputs.COM.x);//0
+    yInputs.push(inputs.COM.y);//1
+    xInputs.push(inputs.f1.x);//2
+    yInputs.push(inputs.f1.y);//3
+    xInputs.push(inputs.f1d); //4
+    yInputs.push(inputs.f1d);
+
     //
-    packedInputs.push(inputs.c1p.x);
-    packedInputs.push(inputs.c1p.y);
-    packedInputs.push(inputs.c1v.x);
-    packedInputs.push(inputs.c1v.y);
-    packedInputs.push(inputs.c1d); //9
+    xInputs.push(inputs.c1p.x);
+    yInputs.push(inputs.c1p.y);
+    xInputs.push(inputs.c1v.x);
+    yInputs.push(inputs.c1v.y);
+    xInputs.push(inputs.c1d); //9
+    yInputs.push(inputs.c1d);
 
-    packedInputs.push(inputs.cw.x) //5//10
-    packedInputs.push(inputs.cw.y) //6//11
-    packedInputs.push(inputs.wd) //7//12
+    xInputs.push(inputs.cw.x) //5//10
+    yInputs.push(inputs.cw.y) //6//11
+    xInputs.push(inputs.wd)
+    yInputs.push(inputs.wd) //7//12
+    xInputs = xInputs.map(i=>(i + 1) / 2)
+    yInputs = yInputs.map(i=>(i + 1) / 2)
 
-
-    packedInputs = packedInputs.map(i=>(i + 1) / 2)
     // packedInputs.push(Math.random());
 
-    return packedInputs
+    return {x:xInputs,y:yInputs}
   }
 
   getCreatureInputs(creatures){
@@ -120,7 +128,8 @@ class Creature {
   }
 
   activate(packedInputs) {
-    var output = this.network.activate(packedInputs);
+    var output = this.network.activate(packedInputs.x).concat(
+                this.network.activate(packedInputs.y))
     // var learningRate = .01;
     // var target = [Math.random(),Math.random()];
     // this.network.propagate(learningRate, target);
@@ -139,7 +148,7 @@ class Creature {
     }
     else {
       this.p = this.p.copy().add(this.v.copy().mul(d*-2))
-      this.v.mul(-1)
+      // this.v.mul(-1)
     }
   }
   getGenome () {

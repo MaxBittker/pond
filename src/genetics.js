@@ -96,10 +96,14 @@ const generatePhenoChildren = (entities, c,factor, randLoc, snapshots)=>{
 
 const trainApprentice = (teacher, apprentice, snapshots) => {
   snapshots.forEach(snap => {
-    let target = teacher.network.activate(snap);
-    let result = apprentice.network.activate(snap);
-    var learningRate = .01;
-    apprentice.network.propagate(learningRate, target);
+    const learningRate = .01;
+    let xtarget = teacher.network.activate(snap.x);
+    let xresult = apprentice.network.activate(snap.x);
+    apprentice.network.propagate(learningRate, xtarget);
+
+    let ytarget = teacher.network.activate(snap.y);
+    let yresult = apprentice.network.activate(snap.y);
+    apprentice.network.propagate(learningRate, ytarget);
   })
 
 }
