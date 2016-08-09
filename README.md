@@ -1,3 +1,3 @@
- # pond
-neural network controlled creatures, evolving in a predator-prey enviroment 
+# pond
+Neural network-controlled creatures, evolving in a predator-prey enviroment 
 
